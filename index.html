@@ -6,13 +6,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Project 2</title>
     <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+      body {
+        font-family: Arial;
+      }
+    </style>
   </head>
   <body>
-    <h3>Exploration of ... vs ...</h3>
-    <p>Visualization 1:</p>
-    <script></script>
+    <h3>Exploration of Popular Artists and Songs</h3>
+    <p>Main Visualization</p>
+    <svg
+      id="bars"
+      width="800"
+      height="350"
+      style="margin-top: 10px; margin-bottom: 0px"
+    ></svg>
+    <script>
+      const svg = d3.select("#bars");
+      const width = svg.attr("width");
+      const height = svg.attr("height");
+      const margins = { left: 30, right: 30, top: 30, bottom: 30 };
 
-    <p>Visualization 2:</p>
-    <script></script>
+      const chartWidth = width - margins.left - margins.right;
+      const chartHeight = height - margins.top - margins.bottom;
+
+      let annotations = svg.append("g").attr("id", "annotations");
+
+      let chart = svg
+        .append("g")
+        .attr("transform", `translate(${margins.left},${margins.top})`);
+    </script>
   </body>
 </html>
