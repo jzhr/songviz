@@ -14,12 +14,12 @@
   </head>
   <body>
     <h3>Exploration of Popular Artists and Songs</h3>
-    <p>Main Visualization</p>
+    <p>Main Visualization (Artists vs. # of songs on list)</p>
     <svg
       id="bars"
-      width="800"
+      width="1500"
       height="350"
-      style="margin-top: 10px; margin-bottom: 0px"
+      style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"
     ></svg>
     <script>
       const svg = d3.select("#bars");
@@ -35,6 +35,51 @@
       let chart = svg
         .append("g")
         .attr("transform", `translate(${margins.left},${margins.top})`);
+
+      const requestData = async () => {
+        let [spotifyData, artistData] = await Promise.all([
+          d3.csv("spotifyfixed.csv"),
+          d3.csv("spotify-artist-metadata.csv"),
+        ]);
+
+        let artistsSorted = new Map(
+          [...d3.group(spotifyData, (d) => d.artist)].sort((a, b) => {
+            if (a[1].length < b[1].length) {
+              return -1;
+            }
+            if (a[1].length > b[1].length) {
+              return 1;
+            }
+            return 0;
+          })
+        );
+        console.log(artistsSorted);
+
+        let y = d3
+          .scaleLinear()
+          .domain([1, 17])
+          .range([10, height - 10]);
+
+        let x = d3
+          .scaleBand()
+          .domain(artistsSorted.keys())
+          .range([0, width])
+          .padding(0.1);
+
+        artistsSorted.forEach((d, i) => {
+          console.log(y(d.length));
+          svg
+            .append("line")
+            .attr("x1", x(d[0].artist))
+            .attr("x2", x(d[0].artist))
+            .attr("y1", height)
+            .attr("y2", height - y(d.length))
+            .style("stroke", "#5555F0")
+            .style("stroke-width", 5);
+        });
+      };
+
+      requestData();
     </script>
   </body>
 </html>
