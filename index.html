@@ -10,14 +10,18 @@
       body {
         font-family: Arial;
       }
+      .mouseover {
+        /* To fix the oscillation */
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
     <h3>Exploration of Popular Artists and Songs</h3>
-    <p>Main Visualization (Artists vs. # of songs on list)</p>
+    <p>Main Visualization (Top 10 Artists)</p>
     <svg
       id="bars"
-      width="1500"
+      width="500"
       height="350"
       style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"
     ></svg>
@@ -53,30 +57,94 @@
             return 0;
           })
         );
-        console.log(artistsSorted);
+
+        let topTen = Array.from(artistsSorted).reverse().slice(0, 10);
+        let topTenMap = new Map(topTen);
 
         let y = d3
           .scaleLinear()
-          .domain([1, 17])
-          .range([10, height - 10]);
+          .domain([11, 17])
+          .range([50, height - 100]);
 
         let x = d3
           .scaleBand()
-          .domain(artistsSorted.keys())
+          .domain(topTenMap.keys())
           .range([0, width])
-          .padding(0.1);
+          .padding(1);
 
-        artistsSorted.forEach((d, i) => {
+        topTenMap.forEach((d, i) => {
           console.log(y(d.length));
           svg
             .append("line")
+            .attr("class", "bar")
             .attr("x1", x(d[0].artist))
             .attr("x2", x(d[0].artist))
             .attr("y1", height)
             .attr("y2", height - y(d.length))
             .style("stroke", "#5555F0")
-            .style("stroke-width", 5);
+            .style("stroke-width", 10);
         });
+
+        let bars = d3.selectAll(".bar");
+        bars.data(topTen);
+
+        let tooltipWidth = 180;
+        let tooltipHeight = 40;
+
+        let tooltip = chart
+          .append("g")
+          .attr("class", "tooltip")
+          .attr("visibility", "hidden");
+        tooltip
+          .append("rect")
+          .attr("fill", "black")
+          .attr("opacity", 0.5)
+          .attr("x", -tooltipWidth / 2.0)
+          .attr("y", 0)
+          .attr("width", tooltipWidth)
+          .attr("height", tooltipHeight);
+
+        let txt = tooltip
+          .append("text")
+          .attr("fill", "black")
+          .attr("text-anchor", "middle")
+          .attr("alignment-baseline", "hanging")
+          .attr("x", 0)
+          .attr("y", 5);
+
+        let txt2 = tooltip
+          .append("text")
+          .attr("fill", "black")
+          .attr("text-anchor", "middle")
+          .attr("alignment-baseline", "hanging")
+          .attr("x", 0)
+          .attr("y", 25);
+
+        function mouseEntersPlot() {
+          // Make tooltip visible
+          tooltip.style("visibility", "visible");
+
+          let bar = d3.select(this);
+          let curName = bar.datum()[0];
+          let numOccurrences = bar.datum()[1].length;
+
+          txt.text(curName);
+          txt2.text(numOccurrences);
+
+          // let xPos = x(curName);
+          // let yPos = y(occurrences);
+          // console.log(xPos, yPos);
+
+          // Transform the <g> group so that everything moves together easily
+          tooltip.attr("transform", `translate(${50},${-30})`);
+        }
+
+        function mouseLeavesPlot() {
+          tooltip.style("visibility", "hidden");
+        }
+
+        d3.selectAll(".bar").on("mouseenter", mouseEntersPlot);
+        d3.selectAll(".bar").on("mouseout", mouseLeavesPlot);
       };
 
       requestData();
