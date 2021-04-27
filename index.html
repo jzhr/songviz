@@ -10,9 +10,12 @@
       body {
         font-family: Arial;
       }
-      .mouseover {
+      .tooltip {
         /* To fix the oscillation */
         pointer-events: none;
+      }
+      .x-axis text {
+        transform: rotate(-15deg) translate(-10px);
       }
     </style>
   </head>
@@ -22,7 +25,7 @@
     <svg
       id="bars"
       width="500"
-      height="350"
+      height="400"
       style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"
     ></svg>
     <script>
@@ -31,7 +34,7 @@
 
       const width = svg.attr("width");
       const height = svg.attr("height");
-      const margins = { left: 50, right: 30, top: 30, bottom: 30 };
+      const margins = { left: 70, right: 30, top: 30, bottom: 70 };
 
       const chartWidth = width - margins.left - margins.right;
       const chartHeight = height - margins.top - margins.bottom;
@@ -63,12 +66,14 @@
         console.log(topTenMap.keys());
 
         // scales
-        let y = d3.scaleLinear().domain([10, 17]).range([chartHeight, 0]);
+        let y = d3.scaleLinear().domain([0, 17]).range([chartHeight, 0]);
         let x = d3.scaleBand().domain(topTenMap.keys()).range([0, chartWidth]);
 
+        // axes
         let leftAxis = d3.axisLeft(y).ticks(7).tickFormat(d3.format(".0f"));
         let leftGridlines = d3
           .axisLeft(y)
+          .ticks(10)
           .tickSize(-chartWidth - 10)
           .tickFormat("");
         annotations
@@ -78,26 +83,50 @@
           .call(leftAxis);
         annotations
           .append("g")
-          .attr("class", "y gridlines")
+          .attr("class", "y-gridlines")
           .attr("transform", `translate(${margins.left - 10},${margins.top})`)
           .call(leftGridlines);
+        svg
+          .append("text")
+          .attr("class", "y-label")
+          .attr("text-anchor", "end")
+          .attr("x", -100)
+          .attr("y", 25)
+          .attr("transform", "rotate(-90)")
+          .text("# of Popular Songs");
 
+        let bottomAxis = d3.axisBottom(x).ticks(10);
+        annotations
+          .append("g")
+          .attr("class", "x-axis")
+          .attr("transform", `translate(${margins.left - 5},330)`)
+          .call(bottomAxis);
+        svg
+          .append("text")
+          .attr("class", "x label")
+          .attr("text-anchor", "middle")
+          .attr("x", chartWidth / 2 + 30)
+          .attr("y", chartHeight + 80)
+          .text("Artist");
+
+        // draw bars
         topTenMap.forEach((d, i) => {
           chart
             .append("line")
             .attr("class", "bar")
-            .attr("x1", x(d[0].artist))
-            .attr("x2", x(d[0].artist))
+            .attr("x1", x(d[0].artist) + 15)
+            .attr("x2", x(d[0].artist) + 15)
             .attr("y1", chartHeight)
             .attr("y2", y(d.length))
             .style("stroke", "#5555F0")
-            .style("stroke-width", 20);
+            .style("stroke-width", "2rem");
         });
 
         let bars = d3.selectAll(".bar");
         bars.data(topTen);
 
-        let tooltipWidth = 180;
+        // draw tooltip
+        let tooltipWidth = 150;
         let tooltipHeight = 40;
 
         let tooltip = chart
@@ -142,10 +171,9 @@
 
           // let xPos = x(curName);
           // let yPos = y(occurrences);
-          // console.log(xPos, yPos);
 
           // Transform the <g> group so that everything moves together easily
-          tooltip.attr("transform", `translate(${50},${-30})`);
+          tooltip.attr("transform", `translate(${350},${-30})`);
         }
 
         function mouseLeavesPlot() {
