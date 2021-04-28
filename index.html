@@ -135,11 +135,13 @@
           .append("g")
           .attr("class", "y-axis")
           .attr("transform", `translate(${margins.left - 10},${margins.top})`)
+          .transition()
           .call(leftAxis);
         annotations
           .append("g")
           .attr("class", "y-gridlines")
           .attr("transform", `translate(${margins.left - 10},${margins.top})`)
+          .transition()
           .call(leftGridlines);
         svg
           .append("text")
@@ -155,6 +157,7 @@
           .append("g")
           .attr("class", "x-axis")
           .attr("transform", `translate(${margins.left},330)`)
+          .transition()
           .call(bottomAxis);
         svg
           .append("text")
@@ -174,7 +177,8 @@
             .attr("y1", chartHeight)
             .attr("y2", y(d.length))
             .style("stroke", "#1DB954")
-            .style("stroke-width", x.bandwidth());
+            .style("stroke-width", x.bandwidth())
+            .transition();
         });
 
         let bars = d3.selectAll(".bar");
@@ -350,6 +354,7 @@
             .append("g")
             .attr("class", "x-axis")
             .attr("transform", `translate(${margins.left},330)`)
+            .transition()
             .call(bottomAxis);
         }
 
