@@ -32,6 +32,10 @@
         height: 400px;
         border: 1px solid black;
       }
+
+      .domain {
+        display: none;
+      }
     </style>
   </head>
 
@@ -50,6 +54,7 @@
             id="female"
           />
           <label for="female"> Female</label>
+
           <input
             type="checkbox"
             class="gendercheckbox"
@@ -57,6 +62,7 @@
             id="male"
           />
           <label for="male"> Male</label>
+
           <input
             type="checkbox"
             class="gendercheckbox"
@@ -64,13 +70,6 @@
             id="group"
           />
           <label for="group"> Group</label>
-          <input
-            type="checkbox"
-            class="gendercheckbox"
-            value="other"
-            id="other"
-          />
-          <label for="other"> Other</label>
         </span>
         <span>
           <p>Filter by Country:</p>
@@ -85,7 +84,7 @@
       </div>
       <svg
         id="bars"
-        width="800"
+        width="850"
         height="400"
         style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"
       ></svg>
@@ -98,7 +97,7 @@
 
       const width = svg.attr("width");
       const height = svg.attr("height");
-      const margins = { left: 70, right: 30, top: 30, bottom: 70 };
+      const margins = { left: 70, right: 50, top: 30, bottom: 70 };
 
       const chartWidth = width - margins.left - margins.right;
       const chartHeight = height - margins.top - margins.bottom;
@@ -119,10 +118,51 @@
 
         // setup scales (y will remain constant)
         let y = d3.scaleLinear().domain([0, 17]).range([chartHeight, 0]);
-        let x = d3.scaleBand().domain(topTenMap.keys()).range([0, chartWidth]);
+        let x = d3
+          .scaleBand()
+          .domain(topTenMap.keys())
+          .range([0, chartWidth])
+          .padding(0.05);
 
         // draw axes
-        refreshAxes(x, y);
+        let leftAxis = d3.axisLeft(y).ticks(7).tickFormat(d3.format(".0f"));
+        let leftGridlines = d3
+          .axisLeft(y)
+          .ticks(10)
+          .tickSize(-chartWidth - 10)
+          .tickFormat("");
+        annotations
+          .append("g")
+          .attr("class", "y-axis")
+          .attr("transform", `translate(${margins.left - 10},${margins.top})`)
+          .call(leftAxis);
+        annotations
+          .append("g")
+          .attr("class", "y-gridlines")
+          .attr("transform", `translate(${margins.left - 10},${margins.top})`)
+          .call(leftGridlines);
+        svg
+          .append("text")
+          .attr("class", "y-label")
+          .attr("text-anchor", "end")
+          .attr("x", -100)
+          .attr("y", 25)
+          .attr("transform", "rotate(-90)")
+          .text("# of Popular Songs");
+
+        let bottomAxis = d3.axisBottom(x).ticks(x.domain().length);
+        annotations
+          .append("g")
+          .attr("class", "x-axis")
+          .attr("transform", `translate(${margins.left},330)`)
+          .call(bottomAxis);
+        svg
+          .append("text")
+          .attr("class", "x-label")
+          .attr("text-anchor", "middle")
+          .attr("x", chartWidth / 2 + 30)
+          .attr("y", chartHeight + 80)
+          .text("Artist");
 
         // draw bars
         topTenMap.forEach((d, i) => {
@@ -133,8 +173,8 @@
             .attr("x2", x(d[0].artist) + margins.left / 2)
             .attr("y1", chartHeight)
             .attr("y2", y(d.length))
-            .style("stroke", "#5555F0")
-            .style("stroke-width", "2rem");
+            .style("stroke", "#1DB954")
+            .style("stroke-width", x.bandwidth());
         });
 
         let bars = d3.selectAll(".bar");
@@ -267,14 +307,18 @@
         }
 
         function update(newData) {
+          // clear old bars
           d3.selectAll("svg .bar").remove();
 
           let dataMap = new Map(newData);
+          console.log(dataMap);
 
           // update x-scale
-          console.log("new x keys", dataMap.keys());
-          x = d3.scaleBand().domain(dataMap.keys()).range([0, chartWidth]);
-          console.log("x", x("Miley Cyrus"));
+          let x = d3
+            .scaleBand()
+            .domain(dataMap.keys())
+            .range([0, chartWidth])
+            .padding(0.05);
 
           dataMap.forEach((d, i) => {
             chart
@@ -284,50 +328,22 @@
               .attr("x2", x(d[0].artist) + margins.left / 2)
               .attr("y1", chartHeight)
               .attr("y2", y(d.length))
-              .style("stroke", "#5555F0")
-              .style("stroke-width", "2rem");
+              .style("stroke", "#1DB954")
+              .style("stroke-width", x.bandwidth());
           });
 
           let bars = d3.selectAll(".bar");
-
           bars
             .on("mouseenter", mouseEntersPlot)
             .on("mouseout", mouseLeavesPlot);
-
           bars.data(newData);
 
-          refreshAxes(x, y);
+          refreshAxis(x);
         }
 
-        function refreshAxes(x, y) {
+        function refreshAxis(x) {
           // clear old stuff
           d3.selectAll(".x-axis,.x-label").remove();
-          d3.selectAll(".y-axis,.y-label,.y-gridlines").remove();
-
-          let leftAxis = d3.axisLeft(y).ticks(7).tickFormat(d3.format(".0f"));
-          let leftGridlines = d3
-            .axisLeft(y)
-            .ticks(10)
-            .tickSize(-chartWidth - 10)
-            .tickFormat("");
-          annotations
-            .append("g")
-            .attr("class", "y-axis")
-            .attr("transform", `translate(${margins.left - 10},${margins.top})`)
-            .call(leftAxis);
-          annotations
-            .append("g")
-            .attr("class", "y-gridlines")
-            .attr("transform", `translate(${margins.left - 10},${margins.top})`)
-            .call(leftGridlines);
-          svg
-            .append("text")
-            .attr("class", "y-label")
-            .attr("text-anchor", "end")
-            .attr("x", -100)
-            .attr("y", 25)
-            .attr("transform", "rotate(-90)")
-            .text("# of Popular Songs");
 
           let bottomAxis = d3.axisBottom(x);
           annotations
@@ -335,13 +351,6 @@
             .attr("class", "x-axis")
             .attr("transform", `translate(${margins.left},330)`)
             .call(bottomAxis);
-          svg
-            .append("text")
-            .attr("class", "x-label")
-            .attr("text-anchor", "middle")
-            .attr("x", chartWidth / 2 + 30)
-            .attr("y", chartHeight + 80)
-            .text("Artist");
         }
 
         d3.selectAll(".bar").on("mouseenter", mouseEntersPlot);
