@@ -97,46 +97,48 @@
       let y = d3.scaleLinear().domain([0, 17]).range([chartHeight, 0]);
       let x = d3.scaleBand().domain(topTenMap.keys()).range([0, chartWidth]);
 
+      refreshAxes(x, y)
+
       // axes
-      let leftAxis = d3.axisLeft(y).ticks(7).tickFormat(d3.format(".0f"));
-      let leftGridlines = d3
-        .axisLeft(y)
-        .ticks(10)
-        .tickSize(-chartWidth - 10)
-        .tickFormat("");
-      annotations
-        .append("g")
-        .attr("class", "y axis")
-        .attr("transform", `translate(${margins.left - 10},${margins.top})`)
-        .call(leftAxis);
-      annotations
-        .append("g")
-        .attr("class", "y-gridlines")
-        .attr("transform", `translate(${margins.left - 10},${margins.top})`)
-        .call(leftGridlines);
-      svg
-        .append("text")
-        .attr("class", "y-label")
-        .attr("text-anchor", "end")
-        .attr("x", -100)
-        .attr("y", 25)
-        .attr("transform", "rotate(-90)")
-        .text("# of Popular Songs");
+      // let leftAxis = d3.axisLeft(y).ticks(7).tickFormat(d3.format(".0f"));
+      // let leftGridlines = d3
+      //   .axisLeft(y)
+      //   .ticks(10)
+      //   .tickSize(-chartWidth - 10)
+      //   .tickFormat("");
+      // annotations
+      //   .append("g")
+      //   .attr("class", "y axis")
+      //   .attr("transform", `translate(${margins.left - 10},${margins.top})`)
+      //   .call(leftAxis);
+      // annotations
+      //   .append("g")
+      //   .attr("class", "y-gridlines")
+      //   .attr("transform", `translate(${margins.left - 10},${margins.top})`)
+      //   .call(leftGridlines);
+      // svg
+      //   .append("text")
+      //   .attr("class", "y-label")
+      //   .attr("text-anchor", "end")
+      //   .attr("x", -100)
+      //   .attr("y", 25)
+      //   .attr("transform", "rotate(-90)")
+      //   .text("# of Popular Songs");
 
-      let bottomAxis = d3.axisBottom(x).ticks(10);
-      annotations
-        .append("g")
-        .attr("class", "x-axis")
-        .attr("transform", `translate(${margins.left - 5},330)`)
-        .call(bottomAxis);
+      // let bottomAxis = d3.axisBottom(x).ticks(10);
+      // annotations
+      //   .append("g")
+      //   .attr("class", "x-axis")
+      //   .attr("transform", `translate(${margins.left - 5},330)`)
+      //   .call(bottomAxis);
 
-      svg
-        .append("text")
-        .attr("class", "x label")
-        .attr("text-anchor", "middle")
-        .attr("x", chartWidth / 2 + 30)
-        .attr("y", chartHeight + 80)
-        .text("Artist");
+      // svg
+      //   .append("text")
+      //   .attr("class", "x label")
+      //   .attr("text-anchor", "middle")
+      //   .attr("x", chartWidth / 2 + 30)
+      //   .attr("y", chartHeight + 80)
+      //   .text("Artist");
 
       // draw bars
       topTenMap.forEach((d, i) => {
@@ -288,10 +290,13 @@
 
 
       function update(newData) {
-        d3.selectAll("svg line").remove();
-        let dataMap = new Map(newData);
+        d3.selectAll("svg .bar").remove();
 
+        let dataMap = new Map(newData);
+        console.log(dataMap)
         x = d3.scaleBand().domain(dataMap.keys()).range([0, chartWidth]);
+        // y = d3.scaleLinear().domain([0, 17]).range([chartHeight, 0]);
+
 
         dataMap.forEach((d, i) => {
           chart
@@ -304,17 +309,62 @@
             .style("stroke", "#5555F0")
             .style("stroke-width", "2rem");
         });
-        console.log("newtopten", newData);
+        // console.log("newtopten", newData);
         let bars = d3.selectAll(".bar");
         bars.data(newData);
 
         // refresh x-axis
+
         d3.selectAll(".x-axis text").remove();
-        bottomAxis.scale(x);
-        annotations.call(bottomAxis);
+        // bottomAxis.scale(x);
+        // annotations.call(bottomAxis);
+        refreshAxes(x, y);
 
         d3.selectAll(".bar").on("mouseenter", mouseEntersPlot);
         d3.selectAll(".bar").on("mouseout", mouseLeavesPlot);
+      }
+
+      function refreshAxes(x, y) {
+        let leftAxis = d3.axisLeft(y).ticks(7).tickFormat(d3.format(".0f"));
+        let leftGridlines = d3
+          .axisLeft(y)
+          .ticks(10)
+          .tickSize(-chartWidth - 10)
+          .tickFormat("");
+        annotations
+          .append("g")
+          .attr("class", "y axis")
+          .attr("transform", `translate(${margins.left - 10},${margins.top})`)
+          .call(leftAxis);
+        annotations
+          .append("g")
+          .attr("class", "y-gridlines")
+          .attr("transform", `translate(${margins.left - 10},${margins.top})`)
+          .call(leftGridlines);
+        svg
+          .append("text")
+          .attr("class", "y-label")
+          .attr("text-anchor", "end")
+          .attr("x", -100)
+          .attr("y", 25)
+          .attr("transform", "rotate(-90)")
+          .text("# of Popular Songs");
+
+
+        let bottomAxis = d3.axisBottom(x).ticks(10);
+        annotations
+          .append("g")
+          .attr("class", "x-axis")
+          .attr("transform", `translate(${margins.left - 5},330)`)
+          .call(bottomAxis);
+
+        svg
+          .append("text")
+          .attr("class", "x label")
+          .attr("text-anchor", "middle")
+          .attr("x", chartWidth / 2 + 30)
+          .attr("y", chartHeight + 80)
+          .text("Artist");
       }
 
       d3.selectAll(".bar").on("mouseenter", mouseEntersPlot);
