@@ -5,9 +5,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="css/rSlider.min.css">
   <title>Project 2</title>
-  <script src="js/rSlider.min.js"></script>
   <script src="https://d3js.org/d3.v6.min.js"></script>
   <style>
     body {
@@ -50,17 +48,19 @@
         <label for="female"> Female</label>
         <input type="checkbox" class="gendercheckbox" value="male" id="male">
         <label for="male"> Male</label>
-        <input type="checkbox" class="gendercheckbox" value="group" id="group">
+        <input type="checkbox" class="gendercheckbox" value="mixed" id="group">
         <label for="group"> Group</label>
+        <input type="checkbox" class="gendercheckbox" value="other" id="other">
+        <label for="other"> Other</label>
       </span>
       <span>
         <p>Filter by Country:</p>
 
-        <input type="checkbox" class="countrycheckbox" value="us" id="us">
+        <input type="checkbox" class="countrycheckbox" value="US" id="us">
         <label for="us"> US</label>
-        <input type="checkbox" class="countrycheckbox" value="can" id="can">
+        <input type="checkbox" class="countrycheckbox" value="CA" id="can">
         <label for="can"> Canada</label>
-        <input type="checkbox" class="countrycheckbox" value="gb" id="gb">
+        <input type="checkbox" class="countrycheckbox" value="GB" id="gb">
         <label for="gb"> Great Britain</label>
 
       </span>
@@ -86,9 +86,10 @@
       .attr("transform", `translate(${margins.left},${margins.top})`);
 
     const requestData = async () => {
-      let [spotifyData, artistData] = await Promise.all([
+      let [spotifyData, artistData, artists2] = await Promise.all([
         d3.csv("spotifyfixed.csv"),
         d3.csv("spotify-artist-metadata.csv"),
+        d3.csv("artistdatasorted.csv"),
       ]);
 
       let artistsSorted = new Map(
@@ -201,6 +202,7 @@
         .attr("y", 25);
 
       function mouseEntersPlot() {
+        console.log('entered')
         // Make tooltip visible
         tooltip.style("visibility", "visible");
 
@@ -232,21 +234,61 @@
       d3.selectAll(".bar").on("mouseenter", mouseEntersPlot);
       d3.selectAll(".bar").on("mouseout", mouseLeavesPlot);
 
-      d3.selectAll(".gendercheckbox").on("change", update);
+      d3.selectAll("input").on("change", update);
+      // d3.selectAll(".countrycheckbox").on("change", update);
 
 
       function update() {
-        var choices = [];
+        var genderchoices = [];
         d3.selectAll(".gendercheckbox").each(function (d) {
           cb = d3.select(this);
           if (cb.property("checked")) {
-            choices.push(cb.property("value"));
+            genderchoices.push(cb.property("value"));
           }
         });
 
-        // if(choices.length > 0){
-        //   newData = spotifydata.filter(function(d,i){return choices.includes(d);});
-        // }
+        if (genderchoices.length > 0) {
+          newData = artists2.filter(function (d, i) { return genderchoices.includes(d['gender']); });
+        }
+        else {
+          newData = artists2
+        }
+
+        var countrychoices = [];
+        d3.selectAll(".countrycheckbox").each(function (d) {
+          cb = d3.select(this);
+          if (cb.property("checked")) {
+            countrychoices.push(cb.property("value"));
+          }
+        });
+
+        if (countrychoices.length > 0) {
+          newData = newData.filter(function (d, i) { return countrychoices.includes(d['country']); });
+        }
+
+        newData = newData.slice(0, 10);
+        map = newData.map(item => { return item.artist })
+        console.log(map)
+
+
+        x = d3.scaleBand().domain(map).range([0, chartWidth]);
+
+        d3.selectAll("svg line").remove();
+
+        newData.forEach((d, i) => {
+          chart
+            .append("line")
+            .attr("class", "bar")
+            .attr("id", d['artist'])
+            .attr("x1", x(d["artist"]) + 15)
+            .attr("x2", x(d["artist"]) + 15)
+            .attr("y1", chartHeight)
+            .attr("y2", y(d['count']))
+            .style("stroke", "#5555F0")
+            .style("stroke-width", "2rem");
+
+        })
+        console.log(newData);
       }
     };
 
