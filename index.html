@@ -1,190 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Project 2</title>
-    <script src="https://d3js.org/d3.v6.min.js"></script>
-    <style>
-      body {
-        font-family: Arial;
-      }
-      .tooltip {
-        /* To fix the oscillation */
-        pointer-events: none;
-      }
-      .x-axis text {
-        transform: rotate(-15deg) translate(-10px);
-      }
-    </style>
-  </head>
-  <body>
-    <h3>Exploration of Popular Artists and Songs</h3>
-    <p>Main Visualization (Top 10 Artists)</p>
-    <svg
-      id="bars"
-      width="500"
-      height="400"
-      style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"
-    ></svg>
-    <script>
-      const svg = d3.select("#bars");
-      let annotations = svg.append("g").attr("id", "annotations");
 
-      const width = svg.attr("width");
-      const height = svg.attr("height");
-      const margins = { left: 70, right: 30, top: 30, bottom: 70 };
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/rSlider.min.css">
+  <title>Project 2</title>
+  <script src="js/rSlider.min.js"></script>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <style>
+    body {
+      font-family: Arial;
+    }
 
-      const chartWidth = width - margins.left - margins.right;
-      const chartHeight = height - margins.top - margins.bottom;
+    .tooltip {
+      /* To fix the oscillation */
+      pointer-events: none;
+    }
 
-      let chart = svg
+    .x-axis text {
+      transform: rotate(-15deg) translate(-10px);
+    }
+
+    .flex-container {
+      display: flex;
+    }
+
+    #filters {
+      margin-top: 10px;
+      padding-left: 10px;
+      padding-right: 10px;
+      width: 250px;
+      height: 400px;
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <h3>Exploration of Popular Artists and Songs</h3>
+  <p>Main Visualization (Top 10 Artists)</p>
+  <div class="flex-container">
+    <div id="filters">
+      <span>
+        <p>Filter by Gender:</p>
+
+        <input type="checkbox" class="gendercheckbox" value="female" id="female">
+        <label for="female"> Female</label>
+        <input type="checkbox" class="gendercheckbox" value="male" id="male">
+        <label for="male"> Male</label>
+        <input type="checkbox" class="gendercheckbox" value="group" id="group">
+        <label for="group"> Group</label>
+      </span>
+      <span>
+        <p>Filter by Country:</p>
+
+        <input type="checkbox" class="countrycheckbox" value="us" id="us">
+        <label for="us"> US</label>
+        <input type="checkbox" class="countrycheckbox" value="can" id="can">
+        <label for="can"> Canada</label>
+        <input type="checkbox" class="countrycheckbox" value="gb" id="gb">
+        <label for="gb"> Great Britain</label>
+
+      </span>
+    </div>
+    <svg id="bars" width="500" height="400" style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black">
+    </svg>
+  </div>
+  <script>
+    const svg = d3.select("#bars");
+    const svgfilter = d3.select("#filters");
+
+    let annotations = svg.append("g").attr("id", "annotations");
+
+    const width = svg.attr("width");
+    const height = svg.attr("height");
+    const margins = { left: 70, right: 30, top: 30, bottom: 70 };
+
+    const chartWidth = width - margins.left - margins.right;
+    const chartHeight = height - margins.top - margins.bottom;
+
+    let chart = svg
+      .append("g")
+      .attr("transform", `translate(${margins.left},${margins.top})`);
+
+    const requestData = async () => {
+      let [spotifyData, artistData] = await Promise.all([
+        d3.csv("spotifyfixed.csv"),
+        d3.csv("spotify-artist-metadata.csv"),
+      ]);
+
+      let artistsSorted = new Map(
+        [...d3.group(spotifyData, (d) => d.artist)].sort((a, b) => {
+          if (a[1].length < b[1].length) {
+            return -1;
+          }
+          if (a[1].length > b[1].length) {
+            return 1;
+          }
+          return 0;
+        })
+      );
+
+      let topTen = Array.from(artistsSorted).reverse().slice(0, 10);
+      let topTenMap = new Map(topTen);
+      console.log(topTenMap.keys());
+
+      // scales
+      let y = d3.scaleLinear().domain([0, 17]).range([chartHeight, 0]);
+      let x = d3.scaleBand().domain(topTenMap.keys()).range([0, chartWidth]);
+
+      // axes
+      let leftAxis = d3.axisLeft(y).ticks(7).tickFormat(d3.format(".0f"));
+      let leftGridlines = d3
+        .axisLeft(y)
+        .ticks(10)
+        .tickSize(-chartWidth - 10)
+        .tickFormat("");
+      annotations
         .append("g")
-        .attr("transform", `translate(${margins.left},${margins.top})`);
+        .attr("class", "y axis")
+        .attr("transform", `translate(${margins.left - 10},${margins.top})`)
+        .call(leftAxis);
+      annotations
+        .append("g")
+        .attr("class", "y-gridlines")
+        .attr("transform", `translate(${margins.left - 10},${margins.top})`)
+        .call(leftGridlines);
+      svg
+        .append("text")
+        .attr("class", "y-label")
+        .attr("text-anchor", "end")
+        .attr("x", -100)
+        .attr("y", 25)
+        .attr("transform", "rotate(-90)")
+        .text("# of Popular Songs");
 
-      const requestData = async () => {
-        let [spotifyData, artistData] = await Promise.all([
-          d3.csv("spotifyfixed.csv"),
-          d3.csv("spotify-artist-metadata.csv"),
-        ]);
+      let bottomAxis = d3.axisBottom(x).ticks(10);
+      annotations
+        .append("g")
+        .attr("class", "x-axis")
+        .attr("transform", `translate(${margins.left - 5},330)`)
+        .call(bottomAxis);
+      svg
+        .append("text")
+        .attr("class", "x label")
+        .attr("text-anchor", "middle")
+        .attr("x", chartWidth / 2 + 30)
+        .attr("y", chartHeight + 80)
+        .text("Artist");
 
-        let artistsSorted = new Map(
-          [...d3.group(spotifyData, (d) => d.artist)].sort((a, b) => {
-            if (a[1].length < b[1].length) {
-              return -1;
-            }
-            if (a[1].length > b[1].length) {
-              return 1;
-            }
-            return 0;
-          })
-        );
+      // draw bars
+      topTenMap.forEach((d, i) => {
+        chart
+          .append("line")
+          .attr("class", "bar")
+          .attr("x1", x(d[0].artist) + 15)
+          .attr("x2", x(d[0].artist) + 15)
+          .attr("y1", chartHeight)
+          .attr("y2", y(d.length))
+          .style("stroke", "#5555F0")
+          .style("stroke-width", "2rem");
+      });
 
-        let topTen = Array.from(artistsSorted).reverse().slice(0, 10);
-        let topTenMap = new Map(topTen);
-        console.log(topTenMap.keys());
+      let bars = d3.selectAll(".bar");
+      bars.data(topTen);
 
-        // scales
-        let y = d3.scaleLinear().domain([0, 17]).range([chartHeight, 0]);
-        let x = d3.scaleBand().domain(topTenMap.keys()).range([0, chartWidth]);
+      // draw tooltip
+      let tooltipWidth = 150;
+      let tooltipHeight = 40;
 
-        // axes
-        let leftAxis = d3.axisLeft(y).ticks(7).tickFormat(d3.format(".0f"));
-        let leftGridlines = d3
-          .axisLeft(y)
-          .ticks(10)
-          .tickSize(-chartWidth - 10)
-          .tickFormat("");
-        annotations
-          .append("g")
-          .attr("class", "y axis")
-          .attr("transform", `translate(${margins.left - 10},${margins.top})`)
-          .call(leftAxis);
-        annotations
-          .append("g")
-          .attr("class", "y-gridlines")
-          .attr("transform", `translate(${margins.left - 10},${margins.top})`)
-          .call(leftGridlines);
-        svg
-          .append("text")
-          .attr("class", "y-label")
-          .attr("text-anchor", "end")
-          .attr("x", -100)
-          .attr("y", 25)
-          .attr("transform", "rotate(-90)")
-          .text("# of Popular Songs");
+      let tooltip = chart
+        .append("g")
+        .attr("class", "tooltip")
+        .attr("visibility", "hidden");
+      tooltip
+        .append("rect")
+        .attr("fill", "black")
+        .attr("opacity", 0.5)
+        .attr("x", -tooltipWidth / 2.0)
+        .attr("y", 0)
+        .attr("width", tooltipWidth)
+        .attr("height", tooltipHeight);
 
-        let bottomAxis = d3.axisBottom(x).ticks(10);
-        annotations
-          .append("g")
-          .attr("class", "x-axis")
-          .attr("transform", `translate(${margins.left - 5},330)`)
-          .call(bottomAxis);
-        svg
-          .append("text")
-          .attr("class", "x label")
-          .attr("text-anchor", "middle")
-          .attr("x", chartWidth / 2 + 30)
-          .attr("y", chartHeight + 80)
-          .text("Artist");
+      let txt = tooltip
+        .append("text")
+        .attr("fill", "white")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "hanging")
+        .attr("x", 0)
+        .attr("y", 5);
 
-        // draw bars
-        topTenMap.forEach((d, i) => {
-          chart
-            .append("line")
-            .attr("class", "bar")
-            .attr("x1", x(d[0].artist) + 15)
-            .attr("x2", x(d[0].artist) + 15)
-            .attr("y1", chartHeight)
-            .attr("y2", y(d.length))
-            .style("stroke", "#5555F0")
-            .style("stroke-width", "2rem");
+      let txt2 = tooltip
+        .append("text")
+        .attr("fill", "white")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "hanging")
+        .attr("x", 0)
+        .attr("y", 25);
+
+      function mouseEntersPlot() {
+        // Make tooltip visible
+        tooltip.style("visibility", "visible");
+
+
+        let bar = d3.select(this);
+        let curName = bar.datum()[0];
+        let numOccurrences = bar.datum()[1].length;
+
+        txt.text(curName);
+        txt2.text(numOccurrences);
+
+        // let xPos = x(curName);
+        // let yPos = y(occurrences);
+
+        // Transform the <g> group so that everything moves together easily
+        tooltip.attr("transform", `translate(${350},${-30})`);
+
+        bar.attr("opacity", 0.8);
+      }
+
+      function mouseLeavesPlot() {
+        tooltip.style("visibility", "hidden");
+
+        d3.select(this)
+          .transition().duration(200)
+          .attr("opacity", 1)
+      }
+
+      d3.selectAll(".bar").on("mouseenter", mouseEntersPlot);
+      d3.selectAll(".bar").on("mouseout", mouseLeavesPlot);
+
+      d3.selectAll(".gendercheckbox").on("change", update);
+
+
+      function update() {
+        var choices = [];
+        d3.selectAll(".gendercheckbox").each(function (d) {
+          cb = d3.select(this);
+          if (cb.property("checked")) {
+            choices.push(cb.property("value"));
+          }
         });
 
-        let bars = d3.selectAll(".bar");
-        bars.data(topTen);
+        // if(choices.length > 0){
+        //   newData = spotifydata.filter(function(d,i){return choices.includes(d);});
+        // }
+      }
+    };
 
-        // draw tooltip
-        let tooltipWidth = 150;
-        let tooltipHeight = 40;
+    requestData();
+  </script>
+</body>
 
-        let tooltip = chart
-          .append("g")
-          .attr("class", "tooltip")
-          .attr("visibility", "hidden");
-        tooltip
-          .append("rect")
-          .attr("fill", "black")
-          .attr("opacity", 0.5)
-          .attr("x", -tooltipWidth / 2.0)
-          .attr("y", 0)
-          .attr("width", tooltipWidth)
-          .attr("height", tooltipHeight);
-
-        let txt = tooltip
-          .append("text")
-          .attr("fill", "white")
-          .attr("text-anchor", "middle")
-          .attr("alignment-baseline", "hanging")
-          .attr("x", 0)
-          .attr("y", 5);
-
-        let txt2 = tooltip
-          .append("text")
-          .attr("fill", "white")
-          .attr("text-anchor", "middle")
-          .attr("alignment-baseline", "hanging")
-          .attr("x", 0)
-          .attr("y", 25);
-
-        function mouseEntersPlot() {
-          // Make tooltip visible
-          tooltip.style("visibility", "visible");
-
-          let bar = d3.select(this);
-          let curName = bar.datum()[0];
-          let numOccurrences = bar.datum()[1].length;
-
-          txt.text(curName);
-          txt2.text(numOccurrences);
-
-          // let xPos = x(curName);
-          // let yPos = y(occurrences);
-
-          // Transform the <g> group so that everything moves together easily
-          tooltip.attr("transform", `translate(${350},${-30})`);
-        }
-
-        function mouseLeavesPlot() {
-          tooltip.style("visibility", "hidden");
-        }
-
-        d3.selectAll(".bar").on("mouseenter", mouseEntersPlot);
-        d3.selectAll(".bar").on("mouseout", mouseLeavesPlot);
-      };
-
-      requestData();
-    </script>
-  </body>
 </html>
