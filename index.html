@@ -166,6 +166,7 @@
           .attr("class", "x-axis")
           .attr("transform", `translate(${margins.left - 5},330)`)
           .call(bottomAxis);
+
         svg
           .append("text")
           .attr("class", "x label")
@@ -189,6 +190,7 @@
 
         let bars = d3.selectAll(".bar");
         bars.data(topTen);
+        console.log("topten", topTen);
 
         // draw tooltip
         let tooltipWidth = 150;
@@ -246,15 +248,8 @@
 
         function mouseLeavesPlot() {
           tooltip.style("visibility", "hidden");
-
           d3.select(this).transition().duration(200).attr("opacity", 1);
         }
-
-        d3.selectAll(".bar").on("mouseenter", mouseEntersPlot);
-        d3.selectAll(".bar").on("mouseout", mouseLeavesPlot);
-
-        d3.selectAll("input").on("change", update);
-        // d3.selectAll(".countrycheckbox").on("change", update);
 
         function update() {
           var genderchoices = [];
@@ -291,9 +286,13 @@
           map = newData.map((item) => {
             return item.artist;
           });
-          console.log(map);
 
           x = d3.scaleBand().domain(map).range([0, chartWidth]);
+
+          // refresh x-axis
+          d3.selectAll(".x-axis text").remove();
+          bottomAxis.scale(x);
+          annotations.call(bottomAxis);
 
           d3.selectAll("svg line").remove();
 
@@ -309,8 +308,19 @@
               .style("stroke", "#5555F0")
               .style("stroke-width", "2rem");
           });
-          console.log(newData);
+          console.log("newtopten", newData);
+          let bars = d3.selectAll(".bar");
+          bars.data(newData);
+
+          d3.selectAll(".bar").on("mouseenter", mouseEntersPlot);
+          d3.selectAll(".bar").on("mouseout", mouseLeavesPlot);
         }
+
+        d3.selectAll(".bar").on("mouseenter", mouseEntersPlot);
+        d3.selectAll(".bar").on("mouseout", mouseLeavesPlot);
+
+        d3.selectAll("input").on("change", update);
+        // d3.selectAll(".countrycheckbox").on("change", update);
       };
 
       requestData();
