@@ -6,6 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Project 2</title>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
   <script src="https://d3js.org/d3.v6.min.js"></script>
   <style>
     body {
@@ -30,8 +31,9 @@
       padding-left: 10px;
       padding-right: 10px;
       width: 350px;
-      height: 400px;
+      height: 500px;
       border: 1px solid black;
+      max-width: 540px;
     }
 
     .domain {
@@ -41,6 +43,85 @@
     .bar {
       cursor: pointer;
     }
+
+    /* -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+    ul.checkboxtags {
+      list-style: none;
+      padding: 20px;
+    }
+
+    ul.checkboxtags li {
+      display: inline-flex;
+      height: 5;
+      margin: 2px;
+    }
+
+    ul.checkboxtagsli label {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, .9);
+      border: 2px solid rgba(139, 139, 139, .3);
+      color: #adadad;
+      border-radius: 25px;
+      white-space: nowrap;
+      margin: 3px 0px;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: all .2s;
+    }
+
+    ul.checkboxtags li label {
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    ul.checkboxtags li label::before {
+      display: inline-block;
+      font-style: normal;
+      font-variant: normal;
+      text-rendering: auto;
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      font-size: 12px;
+      /* padding: 2px 6px 2px 2px; */
+      content: "\f067";
+      transition: transform .3s ease-in-out;
+    }
+
+    ul.checkboxtags li input[type="checkbox"]:checked+label::before {
+      content: "\f00c";
+      transition: transform .3s ease-in-out;
+    }
+
+    ul.checkboxtags li input[type="checkbox"]:checked+label {
+      border: 2px solid #1bdbf8;
+      border-radius: 25px;
+      background-color: #12bbd4;
+      color: #fff;
+      transition: all .2s;
+
+    }
+
+    ul.checkboxtags li input[type="checkbox"] {
+      display: absolute;
+    }
+
+    ul.checkboxtags li input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+    }
+
+    ul.checkboxtags li input[type="checkbox"]+label {
+      border-radius: 25px;
+      border: 2px solid lightgray;
+    }
+
+    /* source: https://www.csscodelab.com/material-css-chips-checkbox-inputs-styles-example/ */
+    /* -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
   </style>
 </head>
 
@@ -51,42 +132,61 @@
     <div id="filters">
       <span>
         <p>Filter by Gender:</p>
-
-        <input type="checkbox" class="gendercheckbox" value="female" id="female" />
-        <label for="female"> Female</label>
-
-        <input type="checkbox" class="gendercheckbox" value="male" id="male" />
-        <label for="male"> Male</label>
-
-        <input type="checkbox" class="gendercheckbox" value="mixed" id="group" />
-        <label for="group"> Group</label>
+        <ul class="checkboxtags">
+          <li>
+            <input type="checkbox" class="gendercheckbox" value="female" id="female" />
+            <label for="female"> Female</label>
+          </li>
+          <li>
+            <input type="checkbox" class="gendercheckbox" value="male" id="male" />
+            <label for="male"> Male</label>
+          </li>
+          <li>
+            <input type="checkbox" class="gendercheckbox" value="mixed" id="group" />
+            <label for="group"> Group</label>
+          </li>
+        </ul>
       </span>
+
       <span>
         <p>Filter by Country:</p>
 
-        <input type="checkbox" class="countrycheckbox" value="US" id="us" />
-        <label for="us"> US</label>
-        <input type="checkbox" class="countrycheckbox" value="CA" id="can" />
-        <label for="can"> Canada</label>
-        <input type="checkbox" class="countrycheckbox" value="GB" id="gb" />
-        <label for="gb"> Great Britain</label>
-        <input type="checkbox" class="countrycheckbox" value="FR" id="fr" />
-        <label for="fr"> France</label>
-        <input type="checkbox" class="countrycheckbox" value="AU" id="au" />
-        <label for="au"> Australia</label>
-        <input type="checkbox" class="countrycheckbox" value="CO" id="co" />
-        <label for="co"> Colombia</label>
-        <input type="checkbox" class="countrycheckbox" value="DE" id="de" />
-        <label for="de"> Germany</label>
-        <input type="checkbox" class="countrycheckbox" value="IE" id="ie" />
-        <label for="ie"> Ireland</label>
-        <input type="checkbox" class="countrycheckbox" value="NL" id="nl" />
-        <label for="nl"> Netherlands</label>
-        <input type="checkbox" class="countrycheckbox" value="SE" id="se" />
-        <label for="se"> Sweden</label>
+        <ul class="checkboxtags">
+          <li><input type="checkbox" class="countrycheckbox" value="US" id="us" />
+            <label for="us"> US</label>
+          </li>
+          <li> <input type="checkbox" class="countrycheckbox" value="CA" id="can" />
+            <label for="can"> Canada</label>
+          </li>
+          <li><input type="checkbox" class="countrycheckbox" value="GB" id="gb" />
+            <label for="gb"> Great Britain</label>
+          </li>
+          <li><input type="checkbox" class="countrycheckbox" value="FR" id="fr" />
+            <label for="fr"> France</label>
+          </li>
+          <li><input type="checkbox" class="countrycheckbox" value="AU" id="au" />
+            <label for="au"> Australia</label>
+          </li>
+          <li><input type="checkbox" class="countrycheckbox" value="CO" id="co" />
+            <label for="co"> Colombia</label>
+          </li>
+          <li><input type="checkbox" class="countrycheckbox" value="DE" id="de" />
+            <label for="de"> Germany</label>
+          </li>
+          <li><input type="checkbox" class="countrycheckbox" value="IE" id="ie" />
+            <label for="ie"> Ireland</label>
+          </li>
+          <li><input type="checkbox" class="countrycheckbox" value="NL" id="nl" />
+            <label for="nl"> Netherlands</label>
+          </li>
+          <li><input type="checkbox" class="countrycheckbox" value="SE" id="se" />
+            <label for="se"> Sweden</label>
+          </li>
+        </ul>
       </span>
     </div>
-    <svg id="bars" width="850" height="400" style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"></svg>
+
+    <svg id="bars" width="850" height="500" style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"></svg>
   </div>
   <script>
     const svg = d3.select("#bars");
@@ -155,7 +255,7 @@
       annotations
         .append("g")
         .attr("class", "x-axis")
-        .attr("transform", `translate(${margins.left},330)`)
+        .attr("transform", `translate(${margins.left},435)`)
         .transition()
         .call(bottomAxis);
       svg
@@ -163,7 +263,7 @@
         .attr("class", "x-label")
         .attr("text-anchor", "middle")
         .attr("x", chartWidth / 2 + 30)
-        .attr("y", chartHeight + 80)
+        .attr("y", chartHeight + 90)
         .text("Artist");
 
       // draw bars
@@ -368,9 +468,17 @@
         annotations
           .append("g")
           .attr("class", "x-axis")
-          .attr("transform", `translate(${margins.left},330)`)
+          .attr("transform", `translate(${margins.left},435)`)
           .transition()
           .call(bottomAxis);
+        svg
+          .append("text")
+          .attr("class", "x-label")
+          .attr("text-anchor", "middle")
+          .attr("x", chartWidth / 2 + 30)
+          .attr("y", chartHeight + 90)
+          .text("Artist");
+
       }
 
       d3.selectAll(".bar").on("mouseenter", mouseEntersPlot);
