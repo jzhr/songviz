@@ -32,8 +32,15 @@
       padding-right: 10px;
       width: 350px;
       height: 500px;
-      border: 1px solid black;
       max-width: 540px;
+    }
+
+    #popout {
+      padding-left: 10px;
+      padding-right: 10px;
+      width: 500px;
+      height: 500px;
+      border: 1px solid black
     }
 
     .domain {
@@ -42,6 +49,74 @@
 
     .bar {
       cursor: pointer;
+    }
+
+    h1 {
+      width: 50%;
+      padding-bottom: 0;
+    }
+
+    .artist {
+      width: 100%;
+      height: 10%;
+      position: relative;
+      display: flex;
+    }
+
+    /* .songs {
+      width: 50%;
+      height: 90%;
+      position: relative;
+      display: flex;
+    }
+
+    .radar-chart {
+      width: 50%;
+      height: 90%;
+      position: relative;
+      display: flex;
+    } */
+
+    .bottom-chart {
+      width: 100%;
+      height: 90%;
+      position: relative;
+      display: flex;
+    }
+
+    .bottom-chart div {
+      display: inline-block;
+      width: 50%;
+      margin-bottom: 0;
+
+      align-self: flex-end;
+    }
+
+    .songs {
+      width: 100%;
+      height: 100%;
+    }
+
+    .radar-chart {
+      margin-bottom: 20px;
+      margin-top: 50px;
+      width: 100%;
+      height: 100%;
+    }
+
+
+    .artist h1 {
+      width: 50%;
+      float: left;
+    }
+
+    .artist p {
+      /* padding: 10px; */
+      display: inline-block;
+      width: 25%;
+      margin-bottom: 0;
+
+      align-self: flex-end;
     }
 
     /* -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -87,7 +162,7 @@
       font-family: "Font Awesome 5 Free";
       font-weight: 900;
       font-size: 12px;
-      /* padding: 2px 6px 2px 2px; */
+      padding: 2px 2px 2px 2px;
       content: "\f067";
       transition: transform .3s ease-in-out;
     }
@@ -186,7 +261,29 @@
       </span>
     </div>
 
-    <svg id="bars" width="850" height="500" style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"></svg>
+    <svg id="bars" width="850" height="400" style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"></svg>
+    <div id="popout">
+      <div class="artist">
+        <h1 id="artist-name">Dummy Artist</h1>
+        <p id="artist-gender">Female</p>
+        <p id="artist-country">USA</p>
+      </div>
+      <div class="bottom-chart">
+        <div class="songs">
+          <p>List of Songs</p>
+        </div>
+        <div class="radar-chart">
+          <svg id="radar" width="100" height="100"
+            style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"></svg>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
   </div>
   <script>
     const svg = d3.select("#bars");
@@ -255,7 +352,7 @@
       annotations
         .append("g")
         .attr("class", "x-axis")
-        .attr("transform", `translate(${margins.left},435)`)
+        .attr("transform", `translate(${margins.left},330)`)
         .transition()
         .call(bottomAxis);
       svg
@@ -263,7 +360,7 @@
         .attr("class", "x-label")
         .attr("text-anchor", "middle")
         .attr("x", chartWidth / 2 + 30)
-        .attr("y", chartHeight + 90)
+        .attr("y", chartHeight + 80)
         .text("Artist");
 
       // draw bars
@@ -468,7 +565,7 @@
         annotations
           .append("g")
           .attr("class", "x-axis")
-          .attr("transform", `translate(${margins.left},435)`)
+          .attr("transform", `translate(${margins.left},330)`)
           .transition()
           .call(bottomAxis);
         svg
@@ -476,7 +573,7 @@
           .attr("class", "x-label")
           .attr("text-anchor", "middle")
           .attr("x", chartWidth / 2 + 30)
-          .attr("y", chartHeight + 90)
+          .attr("y", chartHeight + 80)
           .text("Artist");
 
       }
