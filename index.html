@@ -70,10 +70,20 @@
         <label for="can"> Canada</label>
         <input type="checkbox" class="countrycheckbox" value="GB" id="gb" />
         <label for="gb"> Great Britain</label>
-        <!-- <input type="checkbox" class="countrycheckbox" value="FR" id="fr" />
-        <label for="gb"> France</label>
+        <input type="checkbox" class="countrycheckbox" value="FR" id="fr" />
+        <label for="fr"> France</label>
         <input type="checkbox" class="countrycheckbox" value="AU" id="au" />
-        <label for="gb"> Australia</label> -->
+        <label for="au"> Australia</label>
+        <input type="checkbox" class="countrycheckbox" value="CO" id="co" />
+        <label for="co"> Colombia</label>
+        <input type="checkbox" class="countrycheckbox" value="DE" id="de" />
+        <label for="de"> Germany</label>
+        <input type="checkbox" class="countrycheckbox" value="IE" id="ie" />
+        <label for="ie"> Ireland</label>
+        <input type="checkbox" class="countrycheckbox" value="NL" id="nl" />
+        <label for="nl"> Netherlands</label>
+        <input type="checkbox" class="countrycheckbox" value="SE" id="se" />
+        <label for="se"> Sweden</label>
       </span>
     </div>
     <svg id="bars" width="850" height="400" style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"></svg>
@@ -321,7 +331,6 @@
         d3.selectAll("svg .bar").remove();
 
         let dataMap = new Map(newData);
-        console.log(dataMap);
 
         // update x-scale
         let x = d3
@@ -329,7 +338,6 @@
           .domain(dataMap.keys())
           .range([0, chartWidth])
           .padding(0.05);
-
 
         dataMap.forEach((d, i) => {
           chart
