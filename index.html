@@ -20,9 +20,9 @@
         pointer-events: none;
       }
 
-      .x-axis text {
-        transform: rotate(-15deg) translate(-10px);
-      }
+      /* .x-axis text {
+        transform: translate(-10px, 5px);
+      } */
 
       .flex-container {
         display: flex;
@@ -338,7 +338,7 @@
 
       <svg
         id="bars"
-        width="850"
+        width="950"
         height="400"
         style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"
       ></svg>
@@ -396,12 +396,12 @@
         let topTenMap = new Map(topTen);
 
         // setup scales (y will remain constant)
-        let y = d3.scaleLinear().domain([0, 17]).range([chartHeight, 0]);
+        let y = d3.scaleLinear().domain([0, 18]).range([chartHeight, 0]);
         let x = d3
           .scaleBand()
           .domain(topTenMap.keys())
           .range([0, chartWidth])
-          .padding(0.05);
+          .padding(0.1);
 
         // draw axes
         let leftAxis = d3.axisLeft(y).ticks(7).tickFormat(d3.format(".0f"));
