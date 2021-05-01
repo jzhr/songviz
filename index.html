@@ -58,9 +58,10 @@
 
     .artist {
       width: 100%;
-      height: 10%;
+      height: 20%;
       position: relative;
       display: flex;
+      vertical-align: middle;
     }
 
     /* .songs {
@@ -114,8 +115,9 @@
       display: inline-block;
       width: 25%;
       margin-bottom: 0;
+      vertical-align: middle;
 
-      align-self: flex-end;
+      /* align-self: fle; */
     }
 
     /* -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -227,11 +229,11 @@
         <ul class="checkboxtags">
           <li>
             <input type="checkbox" class="countrycheckbox" value="US" id="us" />
-            <label for="us"> US</label>
+            <label for="us"> USA</label>
           </li>
           <li>
-            <input type="checkbox" class="countrycheckbox" value="CA" id="can" />
-            <label for="can"> Canada</label>
+            <input type="checkbox" class="countrycheckbox" value="CA" id="ca" />
+            <label for="ca"> Canada</label>
           </li>
           <li>
             <input type="checkbox" class="countrycheckbox" value="GB" id="gb" />
@@ -277,11 +279,11 @@
         <p id="artist-country">USA</p>
       </div>
       <div class="bottom-chart">
-        <div class="songs">
-          <p>List of Songs</p>
+        <div class="artist-songs">
+          <!-- <p>List of Songs</p> -->
         </div>
         <div class="radar-chart">
-          <svg id="radar" width="100" height="100" style="
+          <svg id="radar" width="200" height="350" style="
                 margin-top: 10px;
                 margin-bottom: 0px;
                 border: 1px solid black;
@@ -292,8 +294,21 @@
   </div>
 
   <script>
+    const countries = {
+      "US": "USA",
+      "CA": "Canada",
+      "GB": "Great Britain",
+      "FR": "France",
+      "AU": "Australia",
+      "CO": "Colombia",
+      "DE": "Germany",
+      "IE": "Ireland",
+      "NL": "Netherlands",
+      "SE": "Sweden",
+    }
     const svg = d3.select("#bars");
     const svgfilter = d3.select("#filters");
+    const popoutDiv = document.getElementById("popout");
 
     let annotations = svg.append("g").attr("id", "annotations");
 
@@ -304,11 +319,15 @@
     const chartWidth = width - margins.left - margins.right;
     const chartHeight = height - margins.top - margins.bottom;
 
+    let barClicked = false;
+
     let chart = svg
       .append("g")
       .attr("transform", `translate(${margins.left},${margins.top})`);
 
     const requestData = async () => {
+      popoutDiv.style.visibility = "hidden";
+
       let [spotifyData, artistData, artists2] = await Promise.all([
         d3.csv("spotifyfixed.csv"),
         d3.csv("spotify-artist-metadata.csv"),
@@ -388,6 +407,7 @@
       // });
 
 
+      //draw initial bars
       chart.selectAll("rect.bar").data(topTenMap)
         .join("rect")
         .attr("class", "bar")
@@ -396,11 +416,12 @@
         .attr("x", d => x(d[0]))
         .attr("y", y(0))
         .attr("fill", "#1DB954")
+        .on("click", barClick)
         .transition()
         .duration(600)
         .attr("y", d => y(d[1].length))
         .attr("height", d => chartHeight - y(d[1].length))
-        .delay(function (d, i) { return (i * 100) });
+      // .delay(function (d, i) { return (i * 100) });
 
       let bars = d3.selectAll(".bar");
       bars.data(topTen);
@@ -471,6 +492,57 @@
           .duration(200)
           .attr("opacity", 1)
           .attr("stroke-width", 0);
+      }
+
+      function barClick() {
+        console.log("clicked bar");
+
+        let bar = d3.select(this);
+        let curName = bar.datum()[0];
+        let songs = bar.datum()[1];
+        let numSongs = bar.datum()[1].length;
+
+        let aList = getArtist(curName);
+        let gender = aList[0];
+        let country = aList[1];
+
+        let prevArtist = document.getElementById("artist-name").innerHTML;
+        if (popoutDiv.style.visibility === "visible" && prevArtist === curName) {
+          bar
+            .attr("stroke", "#949494");
+          popoutDiv.style.visibility = "hidden";
+        }
+        else {
+          popoutDiv.style.visibility = "visible";
+          bar
+            .attr("stroke", "black");
+        }
+
+        d3.select("#artist-name").text(curName);
+        d3.select("#artist-country").text(countries[country]);
+        d3.select("#artist-gender").text(gender.charAt(0).toUpperCase() + gender.slice(1));
+
+        //fix this getting the list of songs to display
+        // songs.forEach((d, i) => {
+        //   d3.select("#artist-songs")
+        //     .append("span")
+        //   // .text(d.title)
+        //   console.log(d.title)
+        // });
+
+        // d3.select("#artist-songs")
+      }
+
+      function updatePopup() {
+
+      }
+
+      function getArtist(d) {
+        artist = artistData.filter(function (a, j) {
+          return a.artist === d;
+        });
+
+        return [artist[0]['gender'], artist[0]["country"]]
       }
 
       function filter() {
@@ -573,13 +645,15 @@
           .attr("x", d => x(d[0]))
           .attr("y", y(0))
           .attr("fill", "#1DB954")
+          .on("click", barClick)
           .transition()
           .duration(600)
           .attr("y", d => y(d[1].length))
           .attr("height", d => chartHeight - y(d[1].length))
-          .delay(function (d, i) { return (i * 100) });
+        // .delay(function (d, i) { return (i * 100) });
 
         let bars = d3.selectAll(".bar");
+        // bars.on("click", function () { console.log("clicky") });
         bars.on("mouseover", mouseEntersPlot).on("mouseout", mouseLeavesPlot);
         bars.data(newData);
 
