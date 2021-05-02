@@ -39,7 +39,6 @@
       #popout {
         padding-left: 10px;
         padding-right: 10px;
-        margin-left: 20px;
         width: 500px;
         height: 500px;
         border: 1px solid black;
@@ -63,63 +62,50 @@
         height: 20%;
         position: relative;
         display: flex;
-        vertical-align: middle;
+        justify-content: center;
+        align-items: center;
       }
-
-      /* .songs {
-      width: 50%;
-      height: 90%;
-      position: relative;
-      display: flex;
-    }
-
-    .radar-chart {
-      width: 50%;
-      height: 90%;
-      position: relative;
-      display: flex;
-    } */
 
       .bottom-chart {
         width: 100%;
         height: 90%;
         position: relative;
         display: flex;
+        justify-content: center;
       }
 
       .bottom-chart div {
         display: inline-block;
         width: 50%;
-        margin-bottom: 0;
-
-        align-self: flex-end;
-      }
-
-      .songs {
-        width: 100%;
-        height: 100%;
       }
 
       .radar-chart {
-        margin-bottom: 20px;
-        margin-top: 50px;
-        width: 100%;
+        flex: 1;
+        display: inline-block;
+        width: 50%;
         height: 100%;
+        margin-left: 1rem;
       }
 
       .artist h1 {
         width: 50%;
         float: left;
+        text-align: center;
       }
 
       .artist p {
         /* padding: 10px; */
         display: inline-block;
         width: 25%;
-        margin-bottom: 0;
         vertical-align: middle;
+        text-align: center;
+      }
 
-        /* align-self: fle; */
+      .both-viz {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
 
       /* -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
@@ -199,16 +185,11 @@
 
       /* source: https://www.csscodelab.com/material-css-chips-checkbox-inputs-styles-example/ */
       /* -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-
-      .both-viz {
-        display: flex;
-      }
     </style>
   </head>
 
   <body>
     <h3>Exploration of Popular Artists and Songs</h3>
-    <p>Main Visualization (Top 10 Artists)</p>
     <div class="flex-container">
       <div id="filters">
         <span>
@@ -591,6 +572,11 @@
           let songs = bar.datum()[1];
           let numSongs = bar.datum()[1].length;
 
+          let songTitles = [];
+          for (let i = 0; i < songs.length; i++) {
+            songTitles.push(songs[i].title);
+          }
+
           let aList = getArtist(curName);
           let gender = aList[0];
           let country = aList[1];
@@ -605,9 +591,22 @@
             popoutDiv.style.visibility = "hidden";
           } else {
             // if new bar is clicked
+            d3.selectAll(".artist-songs ul").remove();
             d3.selectAll("svg .bar").attr("stroke", "#949494");
             popoutDiv.style.visibility = "visible";
             bar.attr("stroke", "black");
+
+            let songlist = d3
+              .select(".artist-songs")
+              .append("ul")
+              .attr("class", "songlist");
+            songlist
+              .selectAll("li")
+              .data(songTitles)
+              .join("li")
+              .text((d) => {
+                return d;
+              });
           }
 
           d3.select("#artist-name").text(curName);
