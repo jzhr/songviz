@@ -26,20 +26,20 @@
 
       .flex-container {
         display: flex;
+        flex-direction: column;
       }
 
       #filters {
         margin-top: 10px;
         padding-left: 10px;
         padding-right: 10px;
-        width: 350px;
-        height: 500px;
-        max-width: 540px;
+        max-width: 1000px;
       }
 
       #popout {
         padding-left: 10px;
         padding-right: 10px;
+        margin-left: 20px;
         width: 500px;
         height: 500px;
         border: 1px solid black;
@@ -126,7 +126,7 @@
 
       ul.checkboxtags {
         list-style: none;
-        padding: 20px;
+        width: 1200px;
       }
 
       ul.checkboxtags li {
@@ -199,6 +199,10 @@
 
       /* source: https://www.csscodelab.com/material-css-chips-checkbox-inputs-styles-example/ */
       /* -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+      .both-viz {
+        display: flex;
+      }
     </style>
   </head>
 
@@ -337,34 +341,35 @@
           </ul>
         </span>
       </div>
-
-      <svg
-        id="bars"
-        width="950"
-        height="400"
-        style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"
-      ></svg>
-      <div id="popout">
-        <div class="artist">
-          <h1 id="artist-name">Dummy Artist</h1>
-          <p id="artist-gender">Female</p>
-          <p id="artist-country">USA</p>
-        </div>
-        <div class="bottom-chart">
-          <div class="artist-songs">
-            <!-- <p>List of Songs</p> -->
+      <div class="both-viz">
+        <svg
+          id="bars"
+          width="950"
+          height="400"
+          style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"
+        ></svg>
+        <div id="popout">
+          <div class="artist">
+            <h1 id="artist-name">Dummy Artist</h1>
+            <p id="artist-gender">Female</p>
+            <p id="artist-country">USA</p>
           </div>
-          <div class="radar-chart">
-            <svg
-              id="radar"
-              width="200"
-              height="350"
-              style="
-                margin-top: 10px;
-                margin-bottom: 0px;
-                border: 1px solid black;
-              "
-            ></svg>
+          <div class="bottom-chart">
+            <div class="artist-songs">
+              <!-- <p>List of Songs</p> -->
+            </div>
+            <div class="radar-chart">
+              <svg
+                id="radar"
+                width="200"
+                height="350"
+                style="
+                  margin-top: 10px;
+                  margin-bottom: 0px;
+                  border: 1px solid black;
+                "
+              ></svg>
+            </div>
           </div>
         </div>
       </div>
