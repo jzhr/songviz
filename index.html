@@ -600,6 +600,8 @@
             // if pop-out is closed or new bar is clicked
             d3.selectAll(".artist-songs ul").remove();
             d3.selectAll("#radar circle").remove();
+            d3.selectAll("#radar line").remove();
+            d3.selectAll("#radar text").remove();
 
             d3.selectAll("svg .bar").attr("stroke", "#949494");
             popoutDiv.style.visibility = "visible";
@@ -617,10 +619,21 @@
                 return d;
               });
 
-            // create radial chart
-            // https://yangdanny97.github.io/blog/2019/03/01/D3-Spider-Chart
-            let spiderScale = d3.scaleLinear().domain([0, 10]).range([0, 100]);
-            let spiderTicks = [2, 4, 6, 8, 10];
+            // create radial chart (https://yangdanny97.github.io/blog/2019/03/01/D3-Spider-Chart)
+            let spiderScale100 = d3
+              .scaleLinear()
+              .domain([0, 100])
+              .range([0, 100]);
+            let spiderScaleBPM = d3
+              .scaleLinear()
+              .domain([0, 206])
+              .range([0, 100]);
+            let spiderScaleDB = d3
+              .scaleLinear()
+              .domain([-60, -2])
+              .range([0, 100]);
+
+            let spiderTicks = [20, 40, 60, 80, 100];
             let spiderChart = d3.select("#radar");
 
             spiderTicks.forEach((t) =>
@@ -630,8 +643,66 @@
                 .attr("cy", 150)
                 .attr("fill", "none")
                 .attr("stroke", "gray")
-                .attr("r", spiderScale(t))
+                .attr("r", spiderScale100(t))
             );
+
+            function angleToCoordinate(angle, value, feature) {
+              let x;
+              let y;
+
+              switch (feature) {
+                case "nrgy":
+                case "dnce":
+                case "live":
+                  x = Math.cos(angle) * spiderScale100(value);
+                  y = Math.sin(angle) * spiderScale100(value);
+                  break;
+                case "bpm":
+                  x = Math.cos(angle) * spiderScaleBPM(value);
+                  y = Math.sin(angle) * spiderScaleBPM(value);
+                  break;
+                case "dB":
+                  x = Math.cos(angle) * spiderScaleDB(value);
+                  y = Math.sin(angle) * spiderScaleDB(value);
+                  break;
+              }
+
+              return { x: 150 + x, y: 150 - y };
+            }
+
+            let spiderFeatures = ["nrgy", "dnce", "live", "bpm", "dB"];
+            let featureMaxes = [100, 100, 100, 206, -2];
+            for (let i = 0; i < spiderFeatures.length; i++) {
+              let ft_name = spiderFeatures[i];
+              let angle =
+                Math.PI / 2 + (2 * Math.PI * i) / spiderFeatures.length;
+              let line_coordinate = angleToCoordinate(
+                angle,
+                featureMaxes[i],
+                ft_name
+              );
+              let label_coordinate = angleToCoordinate(
+                angle,
+                featureMaxes[i] + 5,
+                ft_name
+              );
+
+              //draw axis line
+              spiderChart
+                .append("line")
+                .attr("x1", 150)
+                .attr("y1", 150)
+                .attr("x2", line_coordinate.x)
+                .attr("y2", line_coordinate.y)
+                .attr("stroke", "black");
+
+              //draw axis label
+              spiderChart
+                .append("text")
+                .attr("x", label_coordinate.x)
+                .attr("y", label_coordinate.y)
+                .text(ft_name);
+            }
           }
 
           d3.select("#artist-name").text(curName);
