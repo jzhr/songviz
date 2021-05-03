@@ -1,446 +1,823 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Project 2</title>
-    <link
-      rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v5.13.0/css/all.css"
-    />
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Lato&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://d3js.org/d3.v6.min.js"></script>
-    <style>
-      body {
-        /* font-family: Arial; */
-        font-family: "Lato", sans-serif;
-      }
 
-      .tooltip {
-        /* To fix the oscillation */
-        pointer-events: none;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project 2</title>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet" />
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <style>
+    body {
+      /* font-family: Arial; */
+      font-family: "Lato", sans-serif;
+    }
 
-      /* .x-axis text {
+    .tooltip {
+      /* To fix the oscillation */
+      pointer-events: none;
+    }
+
+    /* .x-axis text {
         transform: translate(-10px, 5px);
       } */
 
-      .flex-container {
-        display: flex;
-        flex-direction: column;
-      }
+    .flex-container {
+      display: flex;
+      flex-direction: column;
+    }
 
-      #filters {
-        margin-top: 10px;
-        padding-left: 10px;
-        padding-right: 10px;
-        max-width: 1000px;
-      }
+    #filters {
+      margin-top: 10px;
+      padding-left: 10px;
+      padding-right: 10px;
+      max-width: 1000px;
+    }
 
-      #popout {
-        padding-left: 10px;
-        padding-right: 10px;
-        margin-top: 1rem;
-        width: 800px;
-        height: 500px;
-        border: 1px solid black;
-      }
+    #popout {
+      padding-left: 10px;
+      padding-right: 10px;
+      margin-top: 1rem;
+      width: 800px;
+      height: 500px;
+      /* border: 1px solid rgb(53, 53, 53); */
+      background-color: #bdf2fa;
+    }
 
-      #popout ul {
-        text-align: start;
-      }
+    #popout ol {
+      text-align: start;
+      color: black;
+    }
 
-      .domain {
-        display: none;
-      }
+    .domain {
+      display: none;
+    }
 
-      .bar {
-        cursor: pointer;
-      }
+    .bar {
+      cursor: pointer;
+    }
 
-      h1 {
-        width: 50%;
-        padding-bottom: 0;
-      }
+    h1 {
+      width: 50%;
+      padding-bottom: 0;
+    }
 
-      .artist {
-        width: 100%;
-        height: 20%;
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+    .artist {
+      width: 100%;
+      height: 20%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: black;
+    }
 
-      .popout-content {
-        width: 100%;
-        height: 90%;
-        position: relative;
-        display: flex;
-        justify-content: center;
-        text-align: center;
-      }
+    .artist-songs p {
+      font-weight: bolder;
+      text-align: start;
+      font-size: larger;
+      color: black;
+    }
 
-      .popout-content div {
-        display: inline-block;
-        width: 50%;
-      }
+    .popout-content {
+      width: 100%;
+      height: 90%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+    }
 
-      .radar-chart {
-        flex: 1;
-        display: inline-block;
-        margin-left: 1rem;
-      }
+    .popout-content div {
+      display: inline-block;
+      width: 50%;
+    }
 
-      .artist h1 {
-        width: 50%;
-        float: left;
-        text-align: center;
-      }
+    .radar-chart {
+      flex: 1;
+      display: inline-block;
+      margin-left: 1rem;
+    }
 
-      .artist p {
-        /* padding: 10px; */
-        display: inline-block;
-        width: 25%;
-        vertical-align: middle;
-        text-align: center;
-      }
+    .artist h1 {
+      width: 50%;
+      float: left;
+      text-align: center;
+    }
 
-      .both-viz {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      }
+    .artist p {
+      /* padding: 10px; */
+      display: inline-block;
+      width: 25%;
+      vertical-align: middle;
+      text-align: center;
+      color: black;
+    }
 
-      /* -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+    .both-viz {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
 
-      ul.checkboxtags {
-        list-style: none;
-        width: 1200px;
-      }
+    /* -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
-      ul.checkboxtags li {
-        display: inline-flex;
-        height: 5;
-        margin: 2px;
-      }
+    ul.checkboxtags {
+      list-style: none;
+      width: 1200px;
+    }
 
-      ul.checkboxtagsli label {
-        display: inline-block;
-        background-color: rgba(255, 255, 255, 0.9);
-        border: 2px solid rgba(139, 139, 139, 0.3);
-        color: #adadad;
-        border-radius: 25px;
-        white-space: nowrap;
-        margin: 3px 0px;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-        transition: all 0.2s;
-      }
+    ul.checkboxtags li {
+      display: inline-flex;
+      height: 5;
+      margin: 2px;
+    }
 
-      ul.checkboxtags li label {
-        padding: 8px 12px;
-        cursor: pointer;
-      }
+    ul.checkboxtagsli label {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(139, 139, 139, 0.3);
+      color: #adadad;
+      border-radius: 25px;
+      white-space: nowrap;
+      margin: 3px 0px;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.2s;
+    }
 
-      ul.checkboxtags li label::before {
-        display: inline-block;
-        font-style: normal;
-        font-variant: normal;
-        text-rendering: auto;
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        font-size: 12px;
-        padding: 2px 2px 2px 2px;
-        content: "\f067";
-        transition: transform 0.3s ease-in-out;
-      }
+    ul.checkboxtags li label {
+      padding: 8px 12px;
+      cursor: pointer;
+    }
 
-      ul.checkboxtags li input[type="checkbox"]:checked + label::before {
-        content: "\f00c";
-        transition: transform 0.3s ease-in-out;
-      }
+    ul.checkboxtags li label::before {
+      display: inline-block;
+      font-style: normal;
+      font-variant: normal;
+      text-rendering: auto;
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      font-size: 12px;
+      padding: 2px 2px 2px 2px;
+      content: "\f067";
+      transition: transform 0.3s ease-in-out;
+    }
 
-      ul.checkboxtags li input[type="checkbox"]:checked + label {
-        border: 2px solid #1bdbf8;
-        border-radius: 25px;
-        background-color: #12bbd4;
-        color: #fff;
-        transition: all 0.2s;
-      }
+    ul.checkboxtags li input[type="checkbox"]:checked+label::before {
+      content: "\f00c";
+      transition: transform 0.3s ease-in-out;
+    }
 
-      ul.checkboxtags li input[type="checkbox"] {
-        display: absolute;
-      }
+    ul.checkboxtags li input[type="checkbox"]:checked+label {
+      border: 2px solid #1bdbf8;
+      border-radius: 25px;
+      background-color: #12bbd4;
+      color: #fff;
+      transition: all 0.2s;
+    }
 
-      ul.checkboxtags li input[type="checkbox"] {
-        position: absolute;
-        opacity: 0;
-      }
+    ul.checkboxtags li input[type="checkbox"] {
+      display: absolute;
+    }
 
-      ul.checkboxtags li input[type="checkbox"] + label {
-        border-radius: 25px;
-        border: 2px solid lightgray;
-      }
+    ul.checkboxtags li input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+    }
 
-      /* source: https://www.csscodelab.com/material-css-chips-checkbox-inputs-styles-example/ */
-      /* -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-    </style>
-  </head>
+    ul.checkboxtags li input[type="checkbox"]+label {
+      border-radius: 25px;
+      border: 2px solid lightgray;
+    }
 
-  <body>
-    <h3>Exploration of Popular Artists and Songs</h3>
-    <div class="flex-container">
-      <div id="filters">
-        <span>
-          <p>Filter by Gender:</p>
-          <ul class="checkboxtags">
-            <li>
-              <input
-                type="checkbox"
-                class="gendercheckbox"
-                value="female"
-                id="female"
-              />
-              <label for="female"> Female</label>
-            </li>
-            <li>
-              <input
-                type="checkbox"
-                class="gendercheckbox"
-                value="male"
-                id="male"
-              />
-              <label for="male"> Male</label>
-            </li>
-            <li>
-              <input
-                type="checkbox"
-                class="gendercheckbox"
-                value="mixed"
-                id="group"
-              />
-              <label for="group"> Group</label>
-            </li>
-          </ul>
-        </span>
+    /* source: https://www.csscodelab.com/material-css-chips-checkbox-inputs-styles-example/ */
+    /* -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+  </style>
+</head>
 
-        <span>
-          <p>Filter by Country:</p>
+<body>
+  <h3>Exploration of Popular Artists and Songs</h3>
+  <div class="flex-container">
+    <div id="filters">
+      <span>
+        <p>Filter by Gender:</p>
+        <ul class="checkboxtags">
+          <li>
+            <input type="checkbox" class="gendercheckbox" value="female" id="female" />
+            <label for="female"> Female</label>
+          </li>
+          <li>
+            <input type="checkbox" class="gendercheckbox" value="male" id="male" />
+            <label for="male"> Male</label>
+          </li>
+          <li>
+            <input type="checkbox" class="gendercheckbox" value="mixed" id="group" />
+            <label for="group"> Group</label>
+          </li>
+        </ul>
+      </span>
 
-          <ul class="checkboxtags">
-            <li>
-              <input
-                type="checkbox"
-                class="countrycheckbox"
-                value="US"
-                id="us"
-              />
-              <label for="us"> USA</label>
-            </li>
-            <li>
-              <input
-                type="checkbox"
-                class="countrycheckbox"
-                value="CA"
-                id="ca"
-              />
-              <label for="ca"> Canada</label>
-            </li>
-            <li>
-              <input
-                type="checkbox"
-                class="countrycheckbox"
-                value="GB"
-                id="gb"
-              />
-              <label for="gb"> Great Britain</label>
-            </li>
-            <li>
-              <input
-                type="checkbox"
-                class="countrycheckbox"
-                value="FR"
-                id="fr"
-              />
-              <label for="fr"> France</label>
-            </li>
-            <li>
-              <input
-                type="checkbox"
-                class="countrycheckbox"
-                value="AU"
-                id="au"
-              />
-              <label for="au"> Australia</label>
-            </li>
-            <li>
-              <input
-                type="checkbox"
-                class="countrycheckbox"
-                value="CO"
-                id="co"
-              />
-              <label for="co"> Colombia</label>
-            </li>
-            <li>
-              <input
-                type="checkbox"
-                class="countrycheckbox"
-                value="DE"
-                id="de"
-              />
-              <label for="de"> Germany</label>
-            </li>
-            <li>
-              <input
-                type="checkbox"
-                class="countrycheckbox"
-                value="IE"
-                id="ie"
-              />
-              <label for="ie"> Ireland</label>
-            </li>
-            <li>
-              <input
-                type="checkbox"
-                class="countrycheckbox"
-                value="NL"
-                id="nl"
-              />
-              <label for="nl"> Netherlands</label>
-            </li>
-            <li>
-              <input
-                type="checkbox"
-                class="countrycheckbox"
-                value="SE"
-                id="se"
-              />
-              <label for="se"> Sweden</label>
-            </li>
-          </ul>
-        </span>
-      </div>
-      <div class="both-viz">
-        <svg
-          id="bars"
-          width="950"
-          height="400"
-          style="margin-top: 10px; margin-bottom: 0px; border: 1px solid black"
-        ></svg>
-        <div id="popout">
-          <div class="artist">
-            <h1 id="artist-name">Dummy Artist</h1>
-            <p id="artist-gender">Female</p>
-            <p id="artist-country">USA</p>
+      <span>
+        <p>Filter by Country:</p>
+
+        <ul class="checkboxtags">
+          <li>
+            <input type="checkbox" class="countrycheckbox" value="US" id="us" />
+            <label for="us"> USA</label>
+          </li>
+          <li>
+            <input type="checkbox" class="countrycheckbox" value="CA" id="ca" />
+            <label for="ca"> Canada</label>
+          </li>
+          <li>
+            <input type="checkbox" class="countrycheckbox" value="GB" id="gb" />
+            <label for="gb"> Great Britain</label>
+          </li>
+          <li>
+            <input type="checkbox" class="countrycheckbox" value="FR" id="fr" />
+            <label for="fr"> France</label>
+          </li>
+          <li>
+            <input type="checkbox" class="countrycheckbox" value="AU" id="au" />
+            <label for="au"> Australia</label>
+          </li>
+          <li>
+            <input type="checkbox" class="countrycheckbox" value="CO" id="co" />
+            <label for="co"> Colombia</label>
+          </li>
+          <li>
+            <input type="checkbox" class="countrycheckbox" value="DE" id="de" />
+            <label for="de"> Germany</label>
+          </li>
+          <li>
+            <input type="checkbox" class="countrycheckbox" value="IE" id="ie" />
+            <label for="ie"> Ireland</label>
+          </li>
+          <li>
+            <input type="checkbox" class="countrycheckbox" value="NL" id="nl" />
+            <label for="nl"> Netherlands</label>
+          </li>
+          <li>
+            <input type="checkbox" class="countrycheckbox" value="SE" id="se" />
+            <label for="se"> Sweden</label>
+          </li>
+        </ul>
+      </span>
+    </div>
+    <div class="both-viz">
+      <svg id="bars" width="950" height="400" style="margin-top: 10px; margin-bottom: 0px;"></svg>
+      <div id="popout">
+        <div class="artist">
+          <h1 id="artist-name">Dummy Artist</h1>
+          <p id="artist-gender">Female</p>
+          <p id="artist-country">USA</p>
+        </div>
+        <div class="popout-content">
+          <div class="artist-songs">
+            <p>Most Popular Songs</p>
           </div>
-          <div class="popout-content">
-            <div class="artist-songs">
-              <!-- <p>List of Songs</p> -->
-            </div>
-            <div class="radar-chart">
-              <svg
-                id="radar"
-                width="300"
-                height="300"
-                style="margin: 1rem; border: 1px solid black"
-              ></svg>
-            </div>
+          <div class="radar-chart">
+            <svg id="radar" width="300" height="300" style="margin: 1rem;"></svg>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <script>
-      const countries = {
-        US: "USA",
-        CA: "Canada",
-        GB: "Great Britain",
-        FR: "France",
-        AU: "Australia",
-        CO: "Colombia",
-        DE: "Germany",
-        IE: "Ireland",
-        NL: "Netherlands",
-        SE: "Sweden",
-      };
-      const svg = d3.select("#bars");
-      const svgfilter = d3.select("#filters");
-      const popoutDiv = document.getElementById("popout");
+  <script>
+    const countries = {
+      US: "USA",
+      CA: "Canada",
+      GB: "Great Britain",
+      FR: "France",
+      AU: "Australia",
+      CO: "Colombia",
+      DE: "Germany",
+      IE: "Ireland",
+      NL: "Netherlands",
+      SE: "Sweden",
+    };
+    const svg = d3.select("#bars");
+    const svgfilter = d3.select("#filters");
+    const popoutDiv = document.getElementById("popout");
 
-      let annotations = svg.append("g").attr("id", "annotations");
+    let annotations = svg.append("g").attr("id", "annotations");
 
-      const width = svg.attr("width");
-      const height = svg.attr("height");
-      const margins = { left: 70, right: 50, top: 30, bottom: 70 };
+    const width = svg.attr("width");
+    const height = svg.attr("height");
+    const margins = { left: 70, right: 50, top: 30, bottom: 70 };
 
-      const chartWidth = width - margins.left - margins.right;
-      const chartHeight = height - margins.top - margins.bottom;
+    const chartWidth = width - margins.left - margins.right;
+    const chartHeight = height - margins.top - margins.bottom;
 
-      let chart = svg
+    let chart = svg
+      .append("g")
+      .attr("transform", `translate(${margins.left},${margins.top})`);
+
+    const requestData = async () => {
+      popoutDiv.style.visibility = "hidden";
+
+      let [spotifyData, artistData, artists2] = await Promise.all([
+        d3.csv("spotifyfixed.csv", d3.autoType),
+        d3.csv("spotify-artist-metadata.csv"),
+        d3.csv("artistdatasorted.csv"),
+      ]);
+
+      let topTen = getTopTen(spotifyData);
+      let topTenMap = new Map(topTen);
+
+      // setup scales (y will remain constant)
+      let y = d3.scaleLinear().domain([0, 18]).range([chartHeight, 0]);
+      let x = d3
+        .scaleBand()
+        .domain(topTenMap.keys())
+        .range([0, chartWidth])
+        .padding(0.1);
+
+      // draw axes
+      let leftAxis = d3.axisLeft(y).ticks(7).tickFormat(d3.format(".0f"));
+      let leftGridlines = d3
+        .axisLeft(y)
+        .ticks(10)
+        .tickSize(-chartWidth - 10)
+        .tickFormat("");
+      annotations
         .append("g")
-        .attr("transform", `translate(${margins.left},${margins.top})`);
+        .attr("class", "y-axis")
+        .attr("transform", `translate(${margins.left - 10},${margins.top})`)
+        .transition()
+        .call(leftAxis);
+      annotations
+        .append("g")
+        .attr("class", "y-gridlines")
+        .attr("transform", `translate(${margins.left - 10},${margins.top})`)
+        .transition()
+        .call(leftGridlines);
+      svg
+        .append("text")
+        .attr("class", "y-label")
+        .attr("text-anchor", "end")
+        .attr("x", -100)
+        .attr("y", 25)
+        .attr("transform", "rotate(-90)")
+        .text("# of Popular Songs");
 
-      const requestData = async () => {
+      let bottomAxis = d3.axisBottom(x).ticks(x.domain().length);
+      annotations
+        .append("g")
+        .attr("class", "x-axis")
+        .attr("transform", `translate(${margins.left},330)`)
+        .transition()
+        .call(bottomAxis);
+      svg
+        .append("text")
+        .attr("class", "x-label")
+        .attr("text-anchor", "middle")
+        .attr("x", chartWidth / 2 + 30)
+        .attr("y", chartHeight + 80)
+        .text("Artist");
+
+      // draw bars
+      // topTenMap.forEach((d, i) => {
+      //   chart
+      //     .append("rect")
+      //     .attr("class", "bar")
+      //     .attr("width", x.bandwidth())
+      //     // .attr("height", chartHeight - y(d.length))
+      //     .attr("height", chartHeight - y(d.length))
+      //     .attr("x", x(d[0].artist))
+      //     .attr("y", y(d.length))
+      //     .attr("fill", "#1DB954")
+      //     .transition()
+      //   // .duration(800)
+      //   // .attr("y", y(d.length))
+      //   // .attr("height", chartHeight - y(d.length))
+      //   // .delay(i * 100)
+      // });
+
+      //draw initial bars
+      chart
+        .selectAll("rect.bar")
+        .data(topTenMap)
+        .join("rect")
+        .attr("class", "bar")
+        .attr("id", (d) => d[1].length)
+        .attr("width", x.bandwidth())
+        .attr("x", (d) => x(d[0]))
+        .attr("y", y(0))
+        .attr("fill", "#1DB954")
+        .on("click", barClick)
+        .transition()
+        .duration(200)
+        .attr("y", (d) => y(d[1].length))
+        .attr("height", (d) => chartHeight - y(d[1].length));
+      // .delay(function (d, i) { return (i * 100) });
+
+      let bars = d3.selectAll(".bar");
+      bars.data(topTen);
+
+      // draw tooltip
+      let tooltipWidth = 200;
+      let tooltipHeight = 40;
+
+      let tooltip = chart
+        .append("g")
+        .attr("class", "tooltip")
+        .attr("visibility", "hidden");
+
+      tooltip
+        .append("rect")
+        .attr("fill", "black")
+        .attr("opacity", 0.5)
+        .attr("x", -tooltipWidth / 2.0)
+        .attr("y", 0)
+        .attr("width", tooltipWidth)
+        .attr("height", tooltipHeight)
+        .attr("rx", "25");
+
+      let txt = tooltip
+        .append("text")
+        .attr("fill", "white")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "hanging")
+        .attr("x", 0)
+        .attr("y", 5);
+      let txt2 = tooltip
+        .append("text")
+        .attr("fill", "white")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "hanging")
+        .attr("x", 0)
+        .attr("y", 25);
+
+      function mouseEntersPlot() {
+        console.log("entered bar");
+        // Make tooltip visible
+        tooltip.style("visibility", "visible");
+
+        let bar = d3.select(this);
+        let curName = bar.datum()[0];
+        let numOccurrences = bar.datum()[1].length;
+
+        txt.text(curName);
+        txt2.text(numOccurrences);
+
+        // let xPos = x(curName);
+        // let yPos = y(occurrences);
+
+        // Transform the <g> group so that everything moves together easily
+        tooltip.attr("transform", `translate(${350},${-30})`);
+
+        if (d3.select(this).attr("stroke") !== "black") {
+          d3.select(this)
+
+            .attr("opacity", 0.7)
+            .attr("stroke", "#949494")
+            .attr("stroke-width", 4);
+        } else {
+          d3.select(this).transition().duration(200).attr("opacity", 1);
+        }
+      }
+
+      function mouseLeavesPlot() {
+        tooltip.style("visibility", "hidden");
+
+        if (d3.select(this).attr("stroke") !== "black") {
+          d3.select(this)
+            .transition()
+            .duration(200)
+            .attr("opacity", 1)
+            .attr("stroke-width", 0);
+        } else {
+          d3.select(this).transition().duration(200).attr("opacity", 1);
+        }
+      }
+
+      function barClick() {
+        console.log("clicked bar");
+
+        let bar = d3.select(this);
+        let curName = bar.datum()[0];
+        let songs = bar.datum()[1];
+        let numSongs = bar.datum()[1].length;
+
+        songs.sort((a, b) => (a.pop > b.pop) ? 1 : ((b.pop > a.pop) ? -1 : 0)).reverse()
+
+        let songTitles = [];
+        for (let i = 0; i < songs.length; i++) {
+          songTitles.push(songs[i].title);
+        }
+
+        let aList = getArtist(curName);
+        let gender = aList[0];
+        let country = aList[1];
+
+        let prevArtist = document.getElementById("artist-name").innerHTML;
+        if (
+          popoutDiv.style.visibility === "visible" &&
+          prevArtist === curName
+        ) {
+          // if pop-out is open and currently selected bar is clicked again
+          bar.attr("stroke", "#949494");
+          popoutDiv.style.visibility = "hidden";
+        } else {
+          // if pop-out is closed or new bar is clicked
+          d3.selectAll(".artist-songs ol").remove();
+          d3.selectAll("#radar circle").remove();
+          d3.selectAll("#radar line").remove();
+          d3.selectAll("#radar text").remove();
+          d3.selectAll("#radar .spider-path").remove();
+
+          d3.selectAll("svg .bar").attr("stroke", "#949494");
+          popoutDiv.style.visibility = "visible";
+          bar.attr("stroke", "black");
+
+          let songlist = d3
+            .select(".artist-songs")
+            .append("ol")
+            .attr("class", "songlist");
+          songlist
+            .selectAll("li")
+            .data(songTitles)
+            .join("li")
+            .text((d) => {
+              return d;
+            });
+
+          // create radial chart (https://yangdanny97.github.io/blog/2019/03/01/D3-Spider-Chart)
+          let spiderScale100 = d3
+            .scaleLinear()
+            .domain([0, 100])
+            .range([0, 100]);
+          let spiderScaleBPM = d3
+            .scaleLinear()
+            .domain([0, 206])
+            .range([0, 100]);
+          let spiderScaleDB = d3
+            .scaleLinear()
+            .domain([-60, -2])
+            .range([0, 100]);
+
+          let spiderTicks = [20, 40, 60, 80, 100];
+          let spiderChart = d3.select("#radar");
+
+          spiderTicks.forEach((t) =>
+            spiderChart
+              .append("circle")
+              .attr("cx", 150)
+              .attr("cy", 150)
+              .attr("fill", "none")
+              .attr("stroke", "gray")
+              .attr("r", spiderScale100(t))
+          );
+
+          function angleToCoordinate(angle, value, feature) {
+            let x;
+            let y;
+
+            switch (feature) {
+              case "nrgy":
+              case "dnce":
+              case "live":
+                x = Math.cos(angle) * spiderScale100(value);
+                y = Math.sin(angle) * spiderScale100(value);
+                break;
+              case "bpm":
+                x = Math.cos(angle) * spiderScaleBPM(value);
+                y = Math.sin(angle) * spiderScaleBPM(value);
+                break;
+              case "dB":
+                x = Math.cos(angle) * spiderScaleDB(value);
+                y = Math.sin(angle) * spiderScaleDB(value);
+                break;
+            }
+
+            return { x: 150 + x, y: 150 - y };
+          }
+
+          let spiderFeatures = ["nrgy", "dnce", "live", "bpm", "dB"];
+          let featureMaxes = [100, 100, 100, 206, -2];
+          for (let i = 0; i < spiderFeatures.length; i++) {
+            let ft_name = spiderFeatures[i];
+            let angle =
+              Math.PI / 2 + (2 * Math.PI * i) / spiderFeatures.length;
+            let line_coordinate = angleToCoordinate(
+              angle,
+              featureMaxes[i],
+              ft_name
+            );
+            let label_coordinate = angleToCoordinate(
+              angle,
+              featureMaxes[i] + 5,
+              ft_name
+            );
+
+            //draw axis line
+            spiderChart
+              .append("line")
+              .attr("x1", 150)
+              .attr("y1", 150)
+              .attr("x2", line_coordinate.x)
+              .attr("y2", line_coordinate.y)
+              .attr("stroke", "black");
+
+            //draw axis label
+            spiderChart
+              .append("text")
+              .attr("x", label_coordinate.x)
+              .attr("y", label_coordinate.y)
+              .text(ft_name);
+          }
+
+          // get spider data
+          let spiderData = [];
+
+          let nrgSum = 0;
+          let dnceSum = 0;
+          let liveSum = 0;
+          let bpmSum = 0;
+          let dbSum = 0;
+          songs.forEach((song) => {
+            nrgSum = nrgSum + song.nrgy;
+            dnceSum = dnceSum + song.dnce;
+            liveSum = liveSum + song.live;
+            bpmSum = bpmSum + song.bpm;
+            dbSum = dbSum + song.dB;
+          });
+
+          spiderData.push(
+            nrgSum / songs.length,
+            dnceSum / songs.length,
+            liveSum / songs.length,
+            bpmSum / songs.length,
+            dbSum / songs.length
+          );
+
+          // plotting the data onto spider
+          let line = d3
+            .line()
+            .x((d) => d.x)
+            .y((d) => d.y);
+          let colors = ["darkorange", "gray", "navy", "red", "blue", "green"];
+
+          let coords = [];
+          for (let i = 0; i < spiderData.length; i++) {
+            let angle =
+              Math.PI / 2 + (2 * Math.PI * i) / spiderFeatures.length;
+            coords.push(
+              angleToCoordinate(angle, spiderData[i], spiderFeatures[i])
+            );
+          }
+          //draw the path element
+          spiderChart
+            .append("path")
+            .datum(coords)
+            .attr("d", line)
+            .attr("class", "spider-path")
+            .attr("stroke-width", 3)
+            .attr("stroke", "green")
+            .attr("fill", "green")
+            .attr("stroke-opacity", 1)
+            .attr("opacity", 0.5);
+        }
+
+        d3.select("#artist-name").text(curName);
+        d3.select("#artist-country").text(countries[country]);
+        d3.select("#artist-gender").text(
+          gender.charAt(0).toUpperCase() + gender.slice(1)
+        );
+      }
+
+      function getArtist(d) {
+        artist = artistData.filter(function (a, j) {
+          return a.artist === d;
+        });
+
+        return [artist[0]["gender"], artist[0]["country"]];
+      }
+
+      function filter() {
+        var genderchoices = [];
+        d3.selectAll(".gendercheckbox").each(function (d) {
+          cb = d3.select(this);
+          if (cb.property("checked")) {
+            genderchoices.push(cb.property("value"));
+          }
+        });
+
+        if (genderchoices.length > 0) {
+          newData = spotifyData.filter(function (d, i) {
+            artist = artistData.filter(function (a, j) {
+              return a.artist === d.artist;
+            });
+            if (artist[0] === undefined) {
+              return false;
+            } else {
+              return genderchoices.includes(artist[0]["gender"]);
+            }
+          });
+        } else {
+          newData = spotifyData;
+        }
+
+        var countrychoices = [];
+        d3.selectAll(".countrycheckbox").each(function (d) {
+          cb = d3.select(this);
+          if (cb.property("checked")) {
+            countrychoices.push(cb.property("value"));
+          }
+        });
+
+        if (countrychoices.length > 0) {
+          newData = newData.filter(function (d, i) {
+            artist = artistData.filter(function (a, j) {
+              return a.artist === d.artist;
+            });
+            if (artist[0] === undefined) {
+              return false;
+            } else {
+              return countrychoices.includes(artist[0]["country"]);
+            }
+          });
+        }
+
+        newData = getTopTen(newData);
+
+        return newData;
+      }
+
+      function getTopTen(data) {
+        let artistsSorted = new Map(
+          [...d3.group(data, (d) => d.artist)].sort((a, b) => {
+            if (a[1].length < b[1].length) {
+              return -1;
+            }
+            if (a[1].length > b[1].length) {
+              return 1;
+            }
+            return 0;
+          })
+        );
+        let topTen = Array.from(artistsSorted).reverse().slice(0, 10);
+
+        return topTen;
+      }
+
+      function update(newData) {
+        // clear old bars
+        d3.selectAll("svg .bar").remove();
         popoutDiv.style.visibility = "hidden";
 
-        let [spotifyData, artistData, artists2] = await Promise.all([
-          d3.csv("spotifyfixed.csv", d3.autoType),
-          d3.csv("spotify-artist-metadata.csv"),
-          d3.csv("artistdatasorted.csv"),
-        ]);
 
-        let topTen = getTopTen(spotifyData);
-        let topTenMap = new Map(topTen);
 
-        // setup scales (y will remain constant)
-        let y = d3.scaleLinear().domain([0, 18]).range([chartHeight, 0]);
+        let dataMap = new Map(newData);
+
+        // update x-scale
         let x = d3
           .scaleBand()
-          .domain(topTenMap.keys())
+          .domain(dataMap.keys())
           .range([0, chartWidth])
-          .padding(0.1);
+          .padding(0.05);
 
-        // draw axes
-        let leftAxis = d3.axisLeft(y).ticks(7).tickFormat(d3.format(".0f"));
-        let leftGridlines = d3
-          .axisLeft(y)
-          .ticks(10)
-          .tickSize(-chartWidth - 10)
-          .tickFormat("");
-        annotations
-          .append("g")
-          .attr("class", "y-axis")
-          .attr("transform", `translate(${margins.left - 10},${margins.top})`)
+        chart
+          .selectAll("rect.bar")
+          .data(dataMap)
+          .join("rect")
+          .attr("class", "bar")
+          .attr("id", (d) => d[1].length)
+          .attr("width", x.bandwidth())
+          .attr("x", (d) => x(d[0]))
+          .attr("y", y(0))
+          .attr("fill", "#1DB954")
+          .on("click", barClick)
           .transition()
-          .call(leftAxis);
-        annotations
-          .append("g")
-          .attr("class", "y-gridlines")
-          .attr("transform", `translate(${margins.left - 10},${margins.top})`)
-          .transition()
-          .call(leftGridlines);
-        svg
-          .append("text")
-          .attr("class", "y-label")
-          .attr("text-anchor", "end")
-          .attr("x", -100)
-          .attr("y", 25)
-          .attr("transform", "rotate(-90)")
-          .text("# of Popular Songs");
+          .duration(600)
+          .attr("y", (d) => y(d[1].length))
+          .attr("height", (d) => chartHeight - y(d[1].length));
+        // .delay(function (d, i) { return (i * 100) });
 
-        let bottomAxis = d3.axisBottom(x).ticks(x.domain().length);
+        let bars = d3.selectAll(".bar");
+        // bars.on("click", function () { console.log("clicky") });
+        bars.on("mouseover", mouseEntersPlot).on("mouseout", mouseLeavesPlot);
+        bars.data(newData);
+
+        refreshAxis(x);
+      }
+
+      function refreshAxis(x) {
+        // clear old stuff
+        d3.selectAll(".x-axis,.x-label").remove();
+
+        let bottomAxis = d3.axisBottom(x);
         annotations
           .append("g")
           .attr("class", "x-axis")
@@ -454,483 +831,18 @@
           .attr("x", chartWidth / 2 + 30)
           .attr("y", chartHeight + 80)
           .text("Artist");
+      }
 
-        // draw bars
-        // topTenMap.forEach((d, i) => {
-        //   chart
-        //     .append("rect")
-        //     .attr("class", "bar")
-        //     .attr("width", x.bandwidth())
-        //     // .attr("height", chartHeight - y(d.length))
-        //     .attr("height", chartHeight - y(d.length))
-        //     .attr("x", x(d[0].artist))
-        //     .attr("y", y(d.length))
-        //     .attr("fill", "#1DB954")
-        //     .transition()
-        //   // .duration(800)
-        //   // .attr("y", y(d.length))
-        //   // .attr("height", chartHeight - y(d.length))
-        //   // .delay(i * 100)
-        // });
+      bars.on("mouseover", mouseEntersPlot).on("mouseout", mouseLeavesPlot);
 
-        //draw initial bars
-        chart
-          .selectAll("rect.bar")
-          .data(topTenMap)
-          .join("rect")
-          .attr("class", "bar")
-          .attr("id", (d) => d[1].length)
-          .attr("width", x.bandwidth())
-          .attr("x", (d) => x(d[0]))
-          .attr("y", y(0))
-          .attr("fill", "#1DB954")
-          .on("click", barClick)
-          .transition()
-          .duration(200)
-          .attr("y", (d) => y(d[1].length))
-          .attr("height", (d) => chartHeight - y(d[1].length));
-        // .delay(function (d, i) { return (i * 100) });
+      d3.selectAll("input").on("change", function () {
+        var filteredData = filter();
+        update(filteredData);
+      });
+    };
 
-        let bars = d3.selectAll(".bar");
-        bars.data(topTen);
+    requestData();
+  </script>
+</body>
 
-        // draw tooltip
-        let tooltipWidth = 200;
-        let tooltipHeight = 40;
-
-        let tooltip = chart
-          .append("g")
-          .attr("class", "tooltip")
-          .attr("visibility", "hidden");
-
-        tooltip
-          .append("rect")
-          .attr("fill", "black")
-          .attr("opacity", 0.5)
-          .attr("x", -tooltipWidth / 2.0)
-          .attr("y", 0)
-          .attr("width", tooltipWidth)
-          .attr("height", tooltipHeight)
-          .attr("rx", "25");
-
-        let txt = tooltip
-          .append("text")
-          .attr("fill", "white")
-          .attr("text-anchor", "middle")
-          .attr("alignment-baseline", "hanging")
-          .attr("x", 0)
-          .attr("y", 5);
-        let txt2 = tooltip
-          .append("text")
-          .attr("fill", "white")
-          .attr("text-anchor", "middle")
-          .attr("alignment-baseline", "hanging")
-          .attr("x", 0)
-          .attr("y", 25);
-
-        function mouseEntersPlot() {
-          console.log("entered bar");
-          // Make tooltip visible
-          tooltip.style("visibility", "visible");
-
-          let bar = d3.select(this);
-          let curName = bar.datum()[0];
-          let numOccurrences = bar.datum()[1].length;
-
-          txt.text(curName);
-          txt2.text(numOccurrences);
-
-          // let xPos = x(curName);
-          // let yPos = y(occurrences);
-
-          // Transform the <g> group so that everything moves together easily
-          tooltip.attr("transform", `translate(${350},${-30})`);
-
-          if (d3.select(this).attr("stroke") !== "black") {
-            d3.select(this)
-
-              .attr("opacity", 0.7)
-              .attr("stroke", "#949494")
-              .attr("stroke-width", 4);
-          } else {
-            d3.select(this).transition().duration(200).attr("opacity", 1);
-          }
-        }
-
-        function mouseLeavesPlot() {
-          tooltip.style("visibility", "hidden");
-
-          if (d3.select(this).attr("stroke") !== "black") {
-            d3.select(this)
-              .transition()
-              .duration(200)
-              .attr("opacity", 1)
-              .attr("stroke-width", 0);
-          } else {
-            d3.select(this).transition().duration(200).attr("opacity", 1);
-          }
-        }
-
-        function barClick() {
-          console.log("clicked bar");
-
-          let bar = d3.select(this);
-          let curName = bar.datum()[0];
-          let songs = bar.datum()[1];
-          let numSongs = bar.datum()[1].length;
-
-          let songTitles = [];
-          for (let i = 0; i < songs.length; i++) {
-            songTitles.push(songs[i].title);
-          }
-
-          let aList = getArtist(curName);
-          let gender = aList[0];
-          let country = aList[1];
-
-          let prevArtist = document.getElementById("artist-name").innerHTML;
-          if (
-            popoutDiv.style.visibility === "visible" &&
-            prevArtist === curName
-          ) {
-            // if pop-out is open and currently selected bar is clicked again
-            bar.attr("stroke", "#949494");
-            popoutDiv.style.visibility = "hidden";
-          } else {
-            // if pop-out is closed or new bar is clicked
-            d3.selectAll(".artist-songs ul").remove();
-            d3.selectAll("#radar circle").remove();
-            d3.selectAll("#radar line").remove();
-            d3.selectAll("#radar text").remove();
-            d3.selectAll("#radar .spider-path").remove();
-
-            d3.selectAll("svg .bar").attr("stroke", "#949494");
-            popoutDiv.style.visibility = "visible";
-            bar.attr("stroke", "black");
-
-            let songlist = d3
-              .select(".artist-songs")
-              .append("ul")
-              .attr("class", "songlist");
-            songlist
-              .selectAll("li")
-              .data(songTitles)
-              .join("li")
-              .text((d) => {
-                return d;
-              });
-
-            // create radial chart (https://yangdanny97.github.io/blog/2019/03/01/D3-Spider-Chart)
-            let spiderScale100 = d3
-              .scaleLinear()
-              .domain([0, 100])
-              .range([0, 100]);
-            let spiderScaleBPM = d3
-              .scaleLinear()
-              .domain([0, 206])
-              .range([0, 100]);
-            let spiderScaleDB = d3
-              .scaleLinear()
-              .domain([-60, -2])
-              .range([0, 100]);
-
-            let spiderTicks = [20, 40, 60, 80, 100];
-            let spiderChart = d3.select("#radar");
-
-            spiderTicks.forEach((t) =>
-              spiderChart
-                .append("circle")
-                .attr("cx", 150)
-                .attr("cy", 150)
-                .attr("fill", "none")
-                .attr("stroke", "gray")
-                .attr("r", spiderScale100(t))
-            );
-
-            function angleToCoordinate(angle, value, feature) {
-              let x;
-              let y;
-
-              switch (feature) {
-                case "nrgy":
-                case "dnce":
-                case "live":
-                  x = Math.cos(angle) * spiderScale100(value);
-                  y = Math.sin(angle) * spiderScale100(value);
-                  break;
-                case "bpm":
-                  x = Math.cos(angle) * spiderScaleBPM(value);
-                  y = Math.sin(angle) * spiderScaleBPM(value);
-                  break;
-                case "dB":
-                  x = Math.cos(angle) * spiderScaleDB(value);
-                  y = Math.sin(angle) * spiderScaleDB(value);
-                  break;
-              }
-
-              return { x: 150 + x, y: 150 - y };
-            }
-
-            let spiderFeatures = ["nrgy", "dnce", "live", "bpm", "dB"];
-            let featureMaxes = [100, 100, 100, 206, -2];
-            for (let i = 0; i < spiderFeatures.length; i++) {
-              let ft_name = spiderFeatures[i];
-              let angle =
-                Math.PI / 2 + (2 * Math.PI * i) / spiderFeatures.length;
-              let line_coordinate = angleToCoordinate(
-                angle,
-                featureMaxes[i],
-                ft_name
-              );
-              let label_coordinate = angleToCoordinate(
-                angle,
-                featureMaxes[i] + 5,
-                ft_name
-              );
-
-              //draw axis line
-              spiderChart
-                .append("line")
-                .attr("x1", 150)
-                .attr("y1", 150)
-                .attr("x2", line_coordinate.x)
-                .attr("y2", line_coordinate.y)
-                .attr("stroke", "black");
-
-              //draw axis label
-              spiderChart
-                .append("text")
-                .attr("x", label_coordinate.x)
-                .attr("y", label_coordinate.y)
-                .text(ft_name);
-            }
-
-            // get spider data
-            let spiderData = [];
-
-            let nrgSum = 0;
-            let dnceSum = 0;
-            let liveSum = 0;
-            let bpmSum = 0;
-            let dbSum = 0;
-            songs.forEach((song) => {
-              nrgSum = nrgSum + song.nrgy;
-              dnceSum = dnceSum + song.dnce;
-              liveSum = liveSum + song.live;
-              bpmSum = bpmSum + song.bpm;
-              dbSum = dbSum + song.dB;
-            });
-
-            spiderData.push(
-              nrgSum / songs.length,
-              dnceSum / songs.length,
-              liveSum / songs.length,
-              bpmSum / songs.length,
-              dbSum / songs.length
-            );
-
-            // plotting the data onto spider
-            let line = d3
-              .line()
-              .x((d) => d.x)
-              .y((d) => d.y);
-            let colors = ["darkorange", "gray", "navy", "red", "blue", "green"];
-
-            let coords = [];
-            for (let i = 0; i < spiderData.length; i++) {
-              let angle =
-                Math.PI / 2 + (2 * Math.PI * i) / spiderFeatures.length;
-              coords.push(
-                angleToCoordinate(angle, spiderData[i], spiderFeatures[i])
-              );
-            }
-            //draw the path element
-            spiderChart
-              .append("path")
-              .datum(coords)
-              .attr("d", line)
-              .attr("class", "spider-path")
-              .attr("stroke-width", 3)
-              .attr("stroke", "green")
-              .attr("fill", "green")
-              .attr("stroke-opacity", 1)
-              .attr("opacity", 0.5);
-          }
-
-          d3.select("#artist-name").text(curName);
-          d3.select("#artist-country").text(countries[country]);
-          d3.select("#artist-gender").text(
-            gender.charAt(0).toUpperCase() + gender.slice(1)
-          );
-
-          //fix this getting the list of songs to display
-          // songs.forEach((d, i) => {
-          //   d3.select("#artist-songs")
-          //     .append("span")
-          //   // .text(d.title)
-          //   console.log(d.title)
-          // });
-
-          // d3.select("#artist-songs")
-        }
-
-        function updatePopup() {}
-
-        function getArtist(d) {
-          artist = artistData.filter(function (a, j) {
-            return a.artist === d;
-          });
-
-          return [artist[0]["gender"], artist[0]["country"]];
-        }
-
-        function filter() {
-          var genderchoices = [];
-          d3.selectAll(".gendercheckbox").each(function (d) {
-            cb = d3.select(this);
-            if (cb.property("checked")) {
-              genderchoices.push(cb.property("value"));
-            }
-          });
-
-          if (genderchoices.length > 0) {
-            newData = spotifyData.filter(function (d, i) {
-              artist = artistData.filter(function (a, j) {
-                return a.artist === d.artist;
-              });
-              if (artist[0] === undefined) {
-                return false;
-              } else {
-                return genderchoices.includes(artist[0]["gender"]);
-              }
-            });
-          } else {
-            newData = spotifyData;
-          }
-
-          var countrychoices = [];
-          d3.selectAll(".countrycheckbox").each(function (d) {
-            cb = d3.select(this);
-            if (cb.property("checked")) {
-              countrychoices.push(cb.property("value"));
-            }
-          });
-
-          if (countrychoices.length > 0) {
-            newData = newData.filter(function (d, i) {
-              artist = artistData.filter(function (a, j) {
-                return a.artist === d.artist;
-              });
-              if (artist[0] === undefined) {
-                return false;
-              } else {
-                return countrychoices.includes(artist[0]["country"]);
-              }
-            });
-          }
-
-          newData = getTopTen(newData);
-
-          return newData;
-        }
-
-        function getTopTen(data) {
-          let artistsSorted = new Map(
-            [...d3.group(data, (d) => d.artist)].sort((a, b) => {
-              if (a[1].length < b[1].length) {
-                return -1;
-              }
-              if (a[1].length > b[1].length) {
-                return 1;
-              }
-              return 0;
-            })
-          );
-          let topTen = Array.from(artistsSorted).reverse().slice(0, 10);
-
-          return topTen;
-        }
-
-        function update(newData) {
-          // clear old bars
-          d3.selectAll("svg .bar").remove();
-          popoutDiv.style.visibility = "hidden";
-
-          let dataMap = new Map(newData);
-
-          // update x-scale
-          let x = d3
-            .scaleBand()
-            .domain(dataMap.keys())
-            .range([0, chartWidth])
-            .padding(0.05);
-
-          // dataMap.forEach((d, i) => {
-          //   chart
-          //     .append("rect")
-          //     .attr("class", "bar")
-          //     .attr("width", x.bandwidth())
-          //     .attr("height", chartHeight - y(d.length))
-          //     .attr("x", x(d[0].artist))
-          //     .attr("y", y(d.length))
-          //     .attr("fill", "#1DB954")
-          //     .transition();
-          // });
-
-          chart
-            .selectAll("rect.bar")
-            .data(dataMap)
-            .join("rect")
-            .attr("class", "bar")
-            .attr("id", (d) => d[1].length)
-            .attr("width", x.bandwidth())
-            .attr("x", (d) => x(d[0]))
-            .attr("y", y(0))
-            .attr("fill", "#1DB954")
-            .on("click", barClick)
-            .transition()
-            .duration(600)
-            .attr("y", (d) => y(d[1].length))
-            .attr("height", (d) => chartHeight - y(d[1].length));
-          // .delay(function (d, i) { return (i * 100) });
-
-          let bars = d3.selectAll(".bar");
-          // bars.on("click", function () { console.log("clicky") });
-          bars.on("mouseover", mouseEntersPlot).on("mouseout", mouseLeavesPlot);
-          bars.data(newData);
-
-          refreshAxis(x);
-        }
-
-        function refreshAxis(x) {
-          // clear old stuff
-          d3.selectAll(".x-axis,.x-label").remove();
-
-          let bottomAxis = d3.axisBottom(x);
-          annotations
-            .append("g")
-            .attr("class", "x-axis")
-            .attr("transform", `translate(${margins.left},330)`)
-            .transition()
-            .call(bottomAxis);
-          svg
-            .append("text")
-            .attr("class", "x-label")
-            .attr("text-anchor", "middle")
-            .attr("x", chartWidth / 2 + 30)
-            .attr("y", chartHeight + 80)
-            .text("Artist");
-        }
-
-        bars.on("mouseover", mouseEntersPlot).on("mouseout", mouseLeavesPlot);
-
-        d3.selectAll("input").on("change", function () {
-          var filteredData = filter();
-          update(filteredData);
-        });
-      };
-
-      requestData();
-    </script>
-  </body>
 </html>
