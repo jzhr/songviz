@@ -396,7 +396,7 @@
         popoutDiv.style.visibility = "hidden";
 
         let [spotifyData, artistData, artists2] = await Promise.all([
-          d3.csv("spotifyfixed.csv"),
+          d3.csv("spotifyfixed.csv", d3.autoType),
           d3.csv("spotify-artist-metadata.csv"),
           d3.csv("artistdatasorted.csv"),
         ]);
@@ -602,6 +602,7 @@
             d3.selectAll("#radar circle").remove();
             d3.selectAll("#radar line").remove();
             d3.selectAll("#radar text").remove();
+            d3.selectAll("#radar .spider-path").remove();
 
             d3.selectAll("svg .bar").attr("stroke", "#949494");
             popoutDiv.style.visibility = "visible";
@@ -703,6 +704,57 @@
                 .attr("y", label_coordinate.y)
                 .text(ft_name);
             }
+
+            // get spider data
+            let spiderData = [];
+
+            let nrgSum = 0;
+            let dnceSum = 0;
+            let liveSum = 0;
+            let bpmSum = 0;
+            let dbSum = 0;
+            songs.forEach((song) => {
+              nrgSum = nrgSum + song.nrgy;
+              dnceSum = dnceSum + song.dnce;
+              liveSum = liveSum + song.live;
+              bpmSum = bpmSum + song.bpm;
+              dbSum = dbSum + song.dB;
+            });
+
+            spiderData.push(
+              nrgSum / songs.length,
+              dnceSum / songs.length,
+              liveSum / songs.length,
+              bpmSum / songs.length,
+              dbSum / songs.length
+            );
+
+            // plotting the data onto spider
+            let line = d3
+              .line()
+              .x((d) => d.x)
+              .y((d) => d.y);
+            let colors = ["darkorange", "gray", "navy", "red", "blue", "green"];
+
+            let coords = [];
+            for (let i = 0; i < spiderData.length; i++) {
+              let angle =
+                Math.PI / 2 + (2 * Math.PI * i) / spiderFeatures.length;
+              coords.push(
+                angleToCoordinate(angle, spiderData[i], spiderFeatures[i])
+              );
+            }
+            //draw the path element
+            spiderChart
+              .append("path")
+              .datum(coords)
+              .attr("d", line)
+              .attr("class", "spider-path")
+              .attr("stroke-width", 3)
+              .attr("stroke", "green")
+              .attr("fill", "green")
+              .attr("stroke-opacity", 1)
+              .attr("opacity", 0.5);
           }
 
           d3.select("#artist-name").text(curName);
